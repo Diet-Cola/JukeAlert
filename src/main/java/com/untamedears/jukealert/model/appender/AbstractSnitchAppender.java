@@ -36,13 +36,6 @@ public abstract class AbstractSnitchAppender {
 	 * @return Whether appender runs when snitch is inactive
 	 */
 	public abstract boolean runWhenSnitchInactive();
-
-	/**
-	 * Called for anything happening within the snitchs coverage area
-	 * 
-	 * @param action Action which happened
-	 */
-	public abstract void acceptAction(SnitchAction action);
 	
 	/**
 	 * Called after the instance is created and was inserted into its surrounding cache structure

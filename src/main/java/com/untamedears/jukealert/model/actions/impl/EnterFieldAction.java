@@ -33,11 +33,6 @@ public class EnterFieldAction extends LoggablePlayerAction {
 	}
 
 	@Override
-	public void accept(Snitch s) {
-		Bukkit.getPluginManager().callEvent(new PlayerHitSnitchEvent(snitch, Bukkit.getPlayer(player)));
-	}
-
-	@Override
 	protected String getChatRepresentationIdentifier() {
 		return "Enter";
 	}

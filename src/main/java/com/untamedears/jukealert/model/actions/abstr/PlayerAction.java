@@ -27,11 +27,6 @@ public abstract class PlayerAction extends SnitchAction {
 		return player;
 	}
 
-	@Override
-	public boolean hasPlayer() {
-		return true;
-	}
-
 	protected String getFormattedTime() {
 		return timeFormatter.format(LocalDateTime.ofEpochSecond(time / 1000, 0, ZoneOffset.UTC));
 	}

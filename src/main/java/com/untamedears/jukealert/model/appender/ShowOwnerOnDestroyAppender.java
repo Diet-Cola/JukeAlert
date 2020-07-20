@@ -1,14 +1,12 @@
 package com.untamedears.jukealert.model.appender;
 
-import java.util.UUID;
-
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventPriority;
 
+import com.untamedears.jukealert.events.SnitchDestroyEvent;
 import com.untamedears.jukealert.model.Snitch;
-import com.untamedears.jukealert.model.actions.abstr.SnitchAction;
-import com.untamedears.jukealert.model.actions.internal.DestroySnitchAction;
+import com.untamedears.jukealert.model.appender.annotations.AppenderEventHandler;
 
 import vg.civcraft.mc.namelayer.NameAPI;
 import vg.civcraft.mc.namelayer.group.Group;
@@ -26,17 +24,9 @@ public class ShowOwnerOnDestroyAppender extends AbstractSnitchAppender {
 		return true;
 	}
 
-	@Override
-	public void acceptAction(SnitchAction action) {
-		if (!action.isLifeCycleEvent()) {
-			return;
-		}
-		if (!(action instanceof DestroySnitchAction)) {
-			return;
-		}
-		DestroySnitchAction dsa = ((DestroySnitchAction) action);
-		UUID destroyerUUID = dsa.getPlayer();
-		Player player = Bukkit.getPlayer(destroyerUUID);
+	@AppenderEventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+	public void snitchBroken(SnitchDestroyEvent event) {
+		Player player = event.getPlayer();
 		if (player == null) {
 			return;
 		}

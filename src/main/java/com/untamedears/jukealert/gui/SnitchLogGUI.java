@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.untamedears.jukealert.JukeAlert;
 import com.untamedears.jukealert.model.Snitch;
-import com.untamedears.jukealert.model.actions.abstr.LoggableAction;
+import com.untamedears.jukealert.model.actions.abstr.SnitchAction;
 import com.untamedears.jukealert.model.appender.LeverToggleAppender;
 import com.untamedears.jukealert.model.appender.SnitchLogAppender;
 import com.untamedears.jukealert.util.JukeAlertPermissionHandler;
@@ -41,7 +41,7 @@ public class SnitchLogGUI {
 
 	private Player player;
 	private Snitch snitch;
-	private List<LoggableAction> actions;
+	private List<SnitchAction> actions;
 	private SnitchLogAppender logAppender;
 
 	public SnitchLogGUI(Player p, Snitch snitch) {

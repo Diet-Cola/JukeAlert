@@ -32,11 +32,6 @@ public class LogoutAction extends LoggablePlayerAction {
 		super.enrichGUIItem(is);
 		return new DecorationStack(is);
 	}
-	
-	@Override
-	public void accept(Snitch s) {
-		Bukkit.getPluginManager().callEvent(new PlayerLogoutSnitchEvent(snitch, Bukkit.getPlayer(player)));
-	}
 
 	@Override
 	protected String getChatRepresentationIdentifier() {

@@ -34,11 +34,6 @@ public class LoginAction extends LoggablePlayerAction {
 	}
 
 	@Override
-	public void accept(Snitch s) {
-		Bukkit.getPluginManager().callEvent(new PlayerLoginSnitchEvent(snitch, Bukkit.getPlayer(player)));
-	}
-
-	@Override
 	protected String getChatRepresentationIdentifier() {
 		return ChatColor.BOLD + "Login";
 	}

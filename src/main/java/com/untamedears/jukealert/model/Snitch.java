@@ -13,8 +13,6 @@ import org.bukkit.entity.Player;
 
 import com.untamedears.jukealert.JukeAlert;
 import com.untamedears.jukealert.model.actions.abstr.SnitchAction;
-import com.untamedears.jukealert.model.actions.internal.DestroySnitchAction;
-import com.untamedears.jukealert.model.actions.internal.DestroySnitchAction.Cause;
 import com.untamedears.jukealert.model.appender.AbstractSnitchAppender;
 import com.untamedears.jukealert.model.field.FieldManager;
 

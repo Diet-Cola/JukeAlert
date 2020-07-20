@@ -21,7 +21,7 @@ public class SnitchLogAppender extends ConfigurableSnitchAppender<LimitedActionT
 
 	public static final String ID = "log";
 
-	private List<LoggableAction> actions;
+	private List<SnitchAction> actions;
 	private boolean hasLoadedAll;
 
 	public SnitchLogAppender(Snitch snitch, ConfigurationSection config) {
@@ -101,7 +101,7 @@ public class SnitchLogAppender extends ConfigurableSnitchAppender<LimitedActionT
 		//TODO
 	}
 
-	public List<LoggableAction> getFullLogs() {
+	public List<SnitchAction> getFullLogs() {
 		if (!hasLoadedAll) {
 			synchronized (actions) {
 				while (!hasLoadedAll) {

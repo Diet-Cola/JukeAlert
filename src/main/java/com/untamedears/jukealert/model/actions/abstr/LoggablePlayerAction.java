@@ -18,7 +18,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import vg.civcraft.mc.civmodcore.api.ItemAPI;
 import vg.civcraft.mc.namelayer.NameAPI;
 
-public abstract class LoggablePlayerAction extends PlayerAction implements LoggableAction {
+public abstract class LoggablePlayerAction extends PlayerAction {
 	
 	private ActionCacheState state;
 	private int id;
@@ -53,11 +53,6 @@ public abstract class LoggablePlayerAction extends PlayerAction implements Logga
 	@Override
 	public ActionCacheState getCacheState() {
 		return state;
-	}
-
-	@Override
-	public boolean isLifeCycleEvent() {
-		return false;
 	}
 	
 	@Override

@@ -1,13 +1,14 @@
 package com.untamedears.jukealert.model.appender;
 
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.event.EventPriority;
 
 import com.untamedears.jukealert.JukeAlert;
+import com.untamedears.jukealert.events.PlayerMoveBlockEvent;
+import com.untamedears.jukealert.events.SnitchDestroyEvent;
 import com.untamedears.jukealert.model.Snitch;
-import com.untamedears.jukealert.model.actions.abstr.LoggablePlayerAction;
-import com.untamedears.jukealert.model.actions.abstr.SnitchAction;
-import com.untamedears.jukealert.model.actions.internal.DestroySnitchAction;
 import com.untamedears.jukealert.model.actions.internal.DestroySnitchAction.Cause;
+import com.untamedears.jukealert.model.appender.annotations.AppenderEventHandler;
 import com.untamedears.jukealert.model.appender.config.DormantCullingConfig;
 import com.untamedears.jukealert.util.JukeAlertPermissionHandler;
 
@@ -49,21 +50,16 @@ public class DormantCullingAppender extends ConfigurableSnitchAppender<DormantCu
 		return true;
 	}
 
-	@Override
-	public void acceptAction(SnitchAction action) {
-		if (action.isLifeCycleEvent()) {
-			if (action instanceof DestroySnitchAction) {
-				JukeAlert.getInstance().getSnitchCullManager().removeCulling(this);
-			}
-			return;
-		}
-		if (!action.hasPlayer()) {
-			return;
-		}
-		LoggablePlayerAction playerAction = (LoggablePlayerAction) action;
-		if (snitch.hasPermission(playerAction.getPlayer(), JukeAlertPermissionHandler.getListSnitches())) {
+	@AppenderEventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+	public void playerMove(PlayerMoveBlockEvent event) {
+		if (snitch.hasPermission(event.getPlayer(), JukeAlertPermissionHandler.getListSnitches())) {
 			refreshTimer();
 		}
+	}
+	
+	@AppenderEventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+	public void snitchDestroy(SnitchDestroyEvent event) {
+		JukeAlert.getInstance().getSnitchCullManager().removeCulling(this);
 	}
 
 	public long getLastRefresh() {

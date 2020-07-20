@@ -5,10 +5,12 @@ import org.bukkit.block.Block;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.Powerable;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.event.EventPriority;
 
 import com.untamedears.jukealert.JukeAlert;
+import com.untamedears.jukealert.events.LoggableActionEvent;
 import com.untamedears.jukealert.model.Snitch;
-import com.untamedears.jukealert.model.actions.abstr.SnitchAction;
+import com.untamedears.jukealert.model.appender.annotations.AppenderEventHandler;
 import com.untamedears.jukealert.model.appender.config.LeverToggleConfig;
 
 public class LeverToggleAppender extends ConfigurableSnitchAppender<LeverToggleConfig> {
@@ -29,12 +31,12 @@ public class LeverToggleAppender extends ConfigurableSnitchAppender<LeverToggleC
 		return false;
 	}
 
-	@Override
-	public void acceptAction(SnitchAction action) {
+	@AppenderEventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
+	public void acceptAction(LoggableActionEvent event) {
 		if (!shouldToggle) {
 			return;
 		}
-		for(LeverToggleConfig.SideEntry entry : config.getEntries(action.getIdentifier())) {
+		for(LeverToggleConfig.SideEntry entry : config.getEntries(event.getAction().getIdentifier())) {
 			Block leverBlock = snitch.getLocation().getBlock().getRelative(entry.getFace());
 			if (leverBlock.getType() != Material.LEVER) {
 				continue;
