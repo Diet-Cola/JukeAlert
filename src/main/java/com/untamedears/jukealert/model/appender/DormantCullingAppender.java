@@ -5,9 +5,9 @@ import org.bukkit.event.EventPriority;
 
 import com.untamedears.jukealert.JukeAlert;
 import com.untamedears.jukealert.events.PlayerMoveBlockEvent;
-import com.untamedears.jukealert.events.SnitchDestroyEvent;
+import com.untamedears.jukealert.events.CoreDestroyEvent;
+import com.untamedears.jukealert.events.CoreDestroyEvent.Cause;
 import com.untamedears.jukealert.model.Snitch;
-import com.untamedears.jukealert.model.actions.internal.DestroySnitchAction.Cause;
 import com.untamedears.jukealert.model.appender.annotations.AppenderEventHandler;
 import com.untamedears.jukealert.model.appender.config.DormantCullingConfig;
 import com.untamedears.jukealert.util.JukeAlertPermissionHandler;
@@ -50,15 +50,15 @@ public class DormantCullingAppender extends ConfigurableSnitchAppender<DormantCu
 		return true;
 	}
 
-	@AppenderEventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+	@AppenderEventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void playerMove(PlayerMoveBlockEvent event) {
 		if (snitch.hasPermission(event.getPlayer(), JukeAlertPermissionHandler.getListSnitches())) {
 			refreshTimer();
 		}
 	}
 	
-	@AppenderEventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-	public void snitchDestroy(SnitchDestroyEvent event) {
+	@AppenderEventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void snitchDestroy(CoreDestroyEvent event) {
 		JukeAlert.getInstance().getSnitchCullManager().removeCulling(this);
 	}
 

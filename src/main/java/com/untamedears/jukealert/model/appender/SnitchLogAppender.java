@@ -5,15 +5,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.event.EventPriority;
 
 import com.untamedears.jukealert.JukeAlert;
 import com.untamedears.jukealert.database.JukeAlertDAO;
+import com.untamedears.jukealert.events.LoggableActionEvent;
 import com.untamedears.jukealert.model.Snitch;
 import com.untamedears.jukealert.model.actions.ActionCacheState;
 import com.untamedears.jukealert.model.actions.LoggedActionFactory;
-import com.untamedears.jukealert.model.actions.abstr.LoggableAction;
-import com.untamedears.jukealert.model.actions.abstr.LoggablePlayerAction;
 import com.untamedears.jukealert.model.actions.abstr.SnitchAction;
+import com.untamedears.jukealert.model.appender.annotations.AppenderEventHandler;
 import com.untamedears.jukealert.model.appender.config.LimitedActionTriggerConfig;
 import com.untamedears.jukealert.util.JukeAlertPermissionHandler;
 
@@ -37,21 +38,18 @@ public class SnitchLogAppender extends ConfigurableSnitchAppender<LimitedActionT
 		}
 	}
 
-	@Override
-	public void acceptAction(SnitchAction action) {
-		if (action.isLifeCycleEvent() || !action.hasPlayer()) {
+	@AppenderEventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void acceptAction(LoggableActionEvent event) {
+		SnitchAction log = event.getAction();
+		if (!config.isTrigger(log.getIdentifier())) {
 			return;
 		}
-		if (!config.isTrigger(action.getIdentifier())) {
-			return;
-		}
-		LoggablePlayerAction log = (LoggablePlayerAction) action;
 		if (snitch.hasPermission(log.getPlayer(), JukeAlertPermissionHandler.getSnitchImmune())) {
 			return;
 		}
 		actions.add(log);
 		if (snitch.getId() != -1) {
-			int id = JukeAlert.getInstance().getLoggedActionFactory().getInternalID(action.getIdentifier());
+			int id = JukeAlert.getInstance().getLoggedActionFactory().getInternalID(log.getIdentifier());
 			if (id != -1) {
 				JukeAlert.getInstance().getDAO().insertLogAsync(id, getSnitch(), log);
 			}
@@ -65,9 +63,9 @@ public class SnitchLogAppender extends ConfigurableSnitchAppender<LimitedActionT
 	public void persist() {
 		JukeAlertDAO dao = JukeAlert.getInstance().getDAO();
 		LoggedActionFactory fac = JukeAlert.getInstance().getLoggedActionFactory();
-		Iterator<LoggableAction> iter = actions.iterator();
+		Iterator<SnitchAction> iter = actions.iterator();
 		while (iter.hasNext()) {
-			LoggableAction action = iter.next();
+			SnitchAction action = iter.next();
 			switch (action.getCacheState()) {
 			case NEW:
 				int id = fac.getInternalID(((SnitchAction)action).getIdentifier());

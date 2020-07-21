@@ -8,11 +8,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 
 import com.untamedears.jukealert.JukeAlert;
+import com.untamedears.jukealert.events.LoggableActionEvent;
 import com.untamedears.jukealert.model.Snitch;
-import com.untamedears.jukealert.model.actions.abstr.LoggablePlayerAction;
 import com.untamedears.jukealert.model.actions.abstr.SnitchAction;
+import com.untamedears.jukealert.model.appender.annotations.AppenderEventHandler;
 import com.untamedears.jukealert.model.appender.config.LimitedActionTriggerConfig;
 import com.untamedears.jukealert.util.JASettingsManager;
 import com.untamedears.jukealert.util.JukeAlertPermissionHandler;
@@ -25,16 +28,13 @@ public class BroadcastEntryAppender extends ConfigurableSnitchAppender<LimitedAc
 		super(snitch, config);
 	}
 
-	@Override
-	public void acceptAction(SnitchAction action) {
-		if (action.isLifeCycleEvent() || !action.hasPlayer()) {
-			return;
-		}
-		LoggablePlayerAction log = (LoggablePlayerAction) action;
+	@AppenderEventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onAction(LoggableActionEvent event) {
+		SnitchAction log = event.getAction();
 		if (snitch.hasPermission(log.getPlayer(), JukeAlertPermissionHandler.getSnitchImmune())) {
 			return;
 		}
-		if (!config.isTrigger(action.getIdentifier())) {
+		if (!config.isTrigger(log.getIdentifier())) {
 			return;
 		}
 		for (UUID uuid : snitch.getGroup().getAllMembers()) {

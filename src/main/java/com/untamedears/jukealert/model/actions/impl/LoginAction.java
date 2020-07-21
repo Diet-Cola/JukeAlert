@@ -6,14 +6,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 
-import com.untamedears.jukealert.events.PlayerLoginSnitchEvent;
 import com.untamedears.jukealert.model.Snitch;
-import com.untamedears.jukealert.model.actions.abstr.LoggablePlayerAction;
+import com.untamedears.jukealert.model.actions.abstr.SnitchAction;
 
 import vg.civcraft.mc.civmodcore.inventorygui.DecorationStack;
 import vg.civcraft.mc.civmodcore.inventorygui.IClickable;
 
-public class LoginAction extends LoggablePlayerAction {
+public class LoginAction extends SnitchAction {
 
 	public static final String ID = "LOGIN";
 

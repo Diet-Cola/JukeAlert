@@ -12,6 +12,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import com.untamedears.jukealert.JukeAlert;
+import com.untamedears.jukealert.events.CoreDestroyEvent;
 import com.untamedears.jukealert.model.actions.abstr.SnitchAction;
 import com.untamedears.jukealert.model.appender.AbstractSnitchAppender;
 import com.untamedears.jukealert.model.field.FieldManager;
@@ -174,22 +175,6 @@ public class Snitch extends LocationTrackable {
 	}
 
 	/**
-	 * Takes an action and processes it through all appenders tied to this snitch
-	 * 
-	 * @param action Action to pass through
-	 */
-	public void processAction(SnitchAction action) {
-		action.accept(this);
-		for (AbstractSnitchAppender appender : appenders.values()) {
-			if (!active && !appender.runWhenSnitchInactive()) {
-				continue;
-			}
-
-			appender.acceptAction(action);
-		}
-	}
-
-	/**
 	 * Sets the active state of the snitch. Certain appenders may choose not to run
 	 * if the snitch is inactive
 	 * 
@@ -213,18 +198,18 @@ public class Snitch extends LocationTrackable {
 		Reinforcement rein = ReinforcementLogic.getReinforcementAt(getLocation());
 		if (rein == null) {
 			//no reinforcement at all
-			destroy(null, Cause.CLEANUP);
+			destroy(null, CoreDestroyEvent.Cause.CLEANUP);
 			return false;
 		}
 		if (!rein.getGroup().getGroupIds().contains(this.groupID)) {
 			//different group
-			destroy(null, Cause.CLEANUP);
+			destroy(null, CoreDestroyEvent.Cause.CLEANUP);
 			return false;
 		}
 		Block block = getLocation().getBlock();
 		if (block.getType() != this.type.getItem().getType()) {
 			//block is no longer a snitch
-			destroy(null, Cause.CLEANUP);
+			destroy(null, CoreDestroyEvent.Cause.CLEANUP);
 			return false;
 		}
 		return true;
@@ -233,9 +218,8 @@ public class Snitch extends LocationTrackable {
 	/**
 	 * Deletes the snitch
 	 */
-	public void destroy(UUID player, DestroySnitchAction.Cause cause) {
+	public void destroy(UUID player, CoreDestroyEvent.Cause cause) {
 		JukeAlert.getInstance().getSnitchManager().removeSnitch(this);
-		processAction(new DestroySnitchAction(System.currentTimeMillis(), this, player, Cause.CULL));
 	}
 
 	/**

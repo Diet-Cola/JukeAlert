@@ -76,12 +76,11 @@ public class LoggableActionListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void enterSnitchProximity(PlayerMoveEvent event) {
-		Location from = event.getFrom();
 		Location to = event.getTo();
 		if (to == null) {
 			return;
 		}
-
+		Location from = event.getFrom();
 		if (from.getBlockX() == to.getBlockX() && from.getBlockY() == to.getBlockY()
 				&& from.getBlockZ() == to.getBlockZ() && from.getWorld().equals(to.getWorld())) {
 			// Player didn't move by at least one block

@@ -7,12 +7,12 @@ import org.bukkit.inventory.ItemStack;
 
 import com.untamedears.jukealert.events.PlayerHitSnitchEvent;
 import com.untamedears.jukealert.model.Snitch;
-import com.untamedears.jukealert.model.actions.abstr.LoggablePlayerAction;
+import com.untamedears.jukealert.model.actions.abstr.SnitchAction;
 
 import vg.civcraft.mc.civmodcore.inventorygui.DecorationStack;
 import vg.civcraft.mc.civmodcore.inventorygui.IClickable;
 
-public class EnterFieldAction extends LoggablePlayerAction {
+public class EnterFieldAction extends SnitchAction {
 
 	public static final String ID = "ENTRY";
 

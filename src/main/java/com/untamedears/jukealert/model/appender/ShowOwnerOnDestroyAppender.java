@@ -4,7 +4,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
 
-import com.untamedears.jukealert.events.SnitchDestroyEvent;
+import com.untamedears.jukealert.events.CoreDestroyEvent;
 import com.untamedears.jukealert.model.Snitch;
 import com.untamedears.jukealert.model.appender.annotations.AppenderEventHandler;
 
@@ -25,7 +25,7 @@ public class ShowOwnerOnDestroyAppender extends AbstractSnitchAppender {
 	}
 
 	@AppenderEventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
-	public void snitchBroken(SnitchDestroyEvent event) {
+	public void snitchBroken(CoreDestroyEvent event) {
 		Player player = event.getPlayer();
 		if (player == null) {
 			return;

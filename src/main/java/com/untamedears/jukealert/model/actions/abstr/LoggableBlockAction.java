@@ -16,7 +16,7 @@ import vg.civcraft.mc.civmodcore.api.ItemNames;
 import vg.civcraft.mc.civmodcore.inventorygui.DecorationStack;
 import vg.civcraft.mc.civmodcore.inventorygui.IClickable;
 
-public abstract class LoggableBlockAction extends LoggablePlayerAction {
+public abstract class LoggableBlockAction extends SnitchAction {
 
 	protected final Location location;
 	protected final Material material;

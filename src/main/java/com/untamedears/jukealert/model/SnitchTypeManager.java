@@ -4,8 +4,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.logging.Logger;
 
@@ -39,6 +41,10 @@ public class SnitchTypeManager {
 		registerAppenderType(LeverToggleAppender.ID, LeverToggleAppender.class);
 		registerAppenderType(DormantCullingAppender.ID, DormantCullingAppender.class);
 		registerAppenderType(ShowOwnerOnDestroyAppender.ID, ShowOwnerOnDestroyAppender.class);
+	} 
+	
+	public Set<Class<? extends AbstractSnitchAppender>> getAllAppenderTypes() {
+		return new HashSet<>(appenderClasses.values());
 	}
 
 	private void registerAppenderType(String id, Class<? extends AbstractSnitchAppender> clazz) {

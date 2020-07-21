@@ -75,7 +75,7 @@ public class SnitchLogGUI {
 	private List<IClickable> constructContent() {
 		List<IClickable> clicks = new ArrayList<>();
 		if (actions != null) {
-			for (LoggableAction action : actions) {
+			for (SnitchAction action : actions) {
 				clicks.add(action.getGUIRepresentation());
 			}
 			if (actions.isEmpty()) {

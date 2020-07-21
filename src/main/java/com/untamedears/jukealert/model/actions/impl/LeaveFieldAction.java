@@ -5,12 +5,12 @@ import java.util.UUID;
 import org.bukkit.inventory.ItemStack;
 
 import com.untamedears.jukealert.model.Snitch;
-import com.untamedears.jukealert.model.actions.abstr.LoggablePlayerAction;
+import com.untamedears.jukealert.model.actions.abstr.SnitchAction;
 
 import vg.civcraft.mc.civmodcore.inventorygui.DecorationStack;
 import vg.civcraft.mc.civmodcore.inventorygui.IClickable;
 
-public class LeaveFieldAction extends LoggablePlayerAction {
+public class LeaveFieldAction extends SnitchAction {
 
 	public static final String ID = "LEAVE";
 

@@ -7,7 +7,7 @@ import org.bukkit.Location;
 import com.untamedears.jukealert.model.Snitch;
 import com.untamedears.jukealert.model.actions.LoggedActionPersistence;
 
-public abstract class LoggablePlayerVictimAction extends LoggablePlayerAction {
+public abstract class LoggablePlayerVictimAction extends SnitchAction {
 	
 	protected final String victim;
 	protected final Location location;

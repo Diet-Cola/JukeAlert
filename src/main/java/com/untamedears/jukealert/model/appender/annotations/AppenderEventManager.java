@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,6 +21,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
 
 import com.untamedears.jukealert.SnitchManager;
+import com.untamedears.jukealert.listener.DynamicListenerHandler;
 import com.untamedears.jukealert.model.Snitch;
 import com.untamedears.jukealert.model.appender.AbstractSnitchAppender;
 
@@ -27,22 +29,20 @@ import vg.civcraft.mc.civmodcore.util.Iteration;
 
 public class AppenderEventManager {
 
-	private class MethodAppenderTuple {
+	private static final class MethodAppenderTuple {
 		private Method method;
-		private Class<? extends AbstractSnitchAppender> appenderClass;
-		private EventPriority priority;
 		private boolean ignoreCancelled;
+		private Class<? extends AbstractSnitchAppender> appenderClass;
 
-		private MethodAppenderTuple(Method m, Class<? extends AbstractSnitchAppender> appenderClass,
-				EventPriority priority, boolean ignoreCancelled) {
-			this.method = m;
+		private MethodAppenderTuple(Method method, Class<? extends AbstractSnitchAppender> appenderClass,
+				boolean ignoreCancelled) {
+			this.method = method;
 			this.appenderClass = appenderClass;
-			this.priority = priority;
 			this.ignoreCancelled = ignoreCancelled;
 		}
 	}
 
-	private Map<Class<? extends Event>, List<MethodAppenderTuple>> eventsToAppenders;
+	private Map<EventClassPrioTuple, List<MethodAppenderTuple>> eventsToAppenders;
 	private Logger logger;
 	private SnitchManager snitchManager;
 
@@ -52,15 +52,15 @@ public class AppenderEventManager {
 		this.snitchManager = snitchManager;
 	}
 
-	public void setup(Collection<Class<? extends AbstractSnitchAppender>> appenders) {
-		for(Class<? extends AbstractSnitchAppender> clazz : appenders) {
-			registerListener(clazz);
+	public void setup(Collection<Class<? extends AbstractSnitchAppender>> appenders,
+			DynamicListenerHandler listenerHandler) {
+		for (Class<? extends AbstractSnitchAppender> clazz : appenders) {
+			registerListener(clazz, listenerHandler);
 		}
-
 	}
 
-	public void handleEvent(Event event, Location location, EventPriority priority) {
-		List<MethodAppenderTuple> handlers = eventsToAppenders.get(event.getClass());
+	public void handleEvent(Event event, EventPriority priority) {
+		List<MethodAppenderTuple> handlers = eventsToAppenders.get(new EventClassPrioTuple(event.getClass(), priority));
 		if (Iteration.isNullOrEmpty(handlers)) {
 			return;
 		}
@@ -70,16 +70,17 @@ public class AppenderEventManager {
 		} else {
 			cancelled = false;
 		}
-		// filter first so we only do the lookup if absolutely neccessary
-		List<MethodAppenderTuple> relevantAppenderTypes = new LinkedList<>();
-		for (MethodAppenderTuple handler : handlers) {
-			if (handler.priority != priority) {
-				continue;
+		List<MethodAppenderTuple> relevantAppenderTypes;
+		if (cancelled) {
+			relevantAppenderTypes = new LinkedList<>();
+			for (MethodAppenderTuple handler : handlers) {
+				if (!handler.ignoreCancelled) {
+					relevantAppenderTypes.add(handler);
+				}
 			}
-			if (cancelled && handler.ignoreCancelled) {
-				continue;
-			}
-			relevantAppenderTypes.add(handler);
+		}
+		else {
+			relevantAppenderTypes = handlers;
 		}
 		if (relevantAppenderTypes.isEmpty()) {
 			return;
@@ -104,7 +105,8 @@ public class AppenderEventManager {
 
 	}
 
-	private void registerListener(Class<? extends AbstractSnitchAppender> appenderClass) {
+	private void registerListener(Class<? extends AbstractSnitchAppender> appenderClass,
+			DynamicListenerHandler listenerHandler) {
 		for (Method method : appenderClass.getMethods()) {
 			if (!Modifier.isPublic(method.getModifiers())) {
 				// method should be public for any outside use case
@@ -140,10 +142,12 @@ public class AppenderEventManager {
 			}
 			// we found a valid listener method at this point
 			@SuppressWarnings("unchecked")
-			List<MethodAppenderTuple> existingListeners = this.eventsToAppenders
-					.computeIfAbsent((Class<? extends Event>) eventClass, s -> new ArrayList<>());
+			Class<? extends Event> eventClassCast = (Class<? extends Event>) eventClass;
+			List<MethodAppenderTuple> existingListeners = this.eventsToAppenders.computeIfAbsent(new EventClassPrioTuple(eventClassCast, priority),
+					s -> new ArrayList<>());
 			method.setAccessible(true);
-			existingListeners.add(new MethodAppenderTuple(method, appenderClass, priority, ignoreCancelled));
+			existingListeners.add(new MethodAppenderTuple(method, appenderClass, ignoreCancelled));
+			listenerHandler.createListenerIfNotExists(eventClassCast, priority);
 		}
 	}
 

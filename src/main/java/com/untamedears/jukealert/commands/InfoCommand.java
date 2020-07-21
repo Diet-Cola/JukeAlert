@@ -15,7 +15,6 @@ import org.bukkit.entity.Player;
 
 import com.untamedears.jukealert.JukeAlert;
 import com.untamedears.jukealert.model.Snitch;
-import com.untamedears.jukealert.model.actions.abstr.LoggableAction;
 import com.untamedears.jukealert.model.actions.abstr.PlayerAction;
 import com.untamedears.jukealert.model.actions.abstr.SnitchAction;
 import com.untamedears.jukealert.model.appender.SnitchLogAppender;
@@ -65,18 +64,15 @@ public class InfoCommand extends StandaloneCommand {
 	public void sendSnitchLog(Player player, Snitch snitch, int offset, int pageLength, String actionType,
 			String filterPlayerName) {
 		SnitchLogAppender logAppender = (SnitchLogAppender) snitch.getAppender(SnitchLogAppender.class);
-		List<LoggableAction> logs = new ArrayList<>(logAppender.getFullLogs());
+		List<SnitchAction> logs = new ArrayList<>(logAppender.getFullLogs());
 		if (filterPlayerName != null) {
 			UUID filterUUID = NameAPI.getUUID(filterPlayerName);
 			if (filterUUID == null) {
 				player.sendMessage(ChatColor.RED + filterPlayerName + " is not a player");
 				return;
 			}
-			List<LoggableAction> logCopy = new LinkedList<>();
-			for (LoggableAction log : logs) {
-				if (!((SnitchAction) log).hasPlayer()) {
-					continue;
-				}
+			List<SnitchAction> logCopy = new LinkedList<>();
+			for (SnitchAction log : logs) {
 				PlayerAction playerAc = (PlayerAction) log;
 				if (playerAc.getPlayer().equals(filterUUID)) {
 					logCopy.add(log);
@@ -85,8 +81,8 @@ public class InfoCommand extends StandaloneCommand {
 			logs = logCopy;
 		}
 		if (actionType != null) {
-			List<LoggableAction> logCopy = new LinkedList<>();
-			for (LoggableAction log : logs) {
+			List<SnitchAction> logCopy = new LinkedList<>();
+			for (SnitchAction log : logs) {
 				if (((SnitchAction) log).getIdentifier().equals(actionType)) {
 					logCopy.add(log);
 				}
@@ -102,7 +98,7 @@ public class InfoCommand extends StandaloneCommand {
 			return;
 		}
 		int currentPageSize = Math.min(pageLength, logs.size() - initialOffset);
-		ListIterator<LoggableAction> iter = logs.listIterator(initialOffset);
+		ListIterator<SnitchAction> iter = logs.listIterator(initialOffset);
 		int currentSlot = 0;
 		TextComponent reply = new TextComponent(ChatColor.GOLD + "--- Page " + offset + " for ");
 		reply.addExtra(JAUtility.genTextComponent(snitch));

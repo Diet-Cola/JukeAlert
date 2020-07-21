@@ -4,7 +4,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class SnitchDestroyEvent extends Event {
+public class CoreDestroyEvent extends Event {
+	
+	public enum Cause {
+		PLAYER, CULL, CLEANUP;
+	}
 
 	@Override
 	public HandlerList getHandlers() {

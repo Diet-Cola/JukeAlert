@@ -9,6 +9,7 @@ import com.untamedears.jukealert.listener.SnitchLifeCycleListener;
 import com.untamedears.jukealert.model.Snitch;
 import com.untamedears.jukealert.model.SnitchTypeManager;
 import com.untamedears.jukealert.model.actions.LoggedActionFactory;
+import com.untamedears.jukealert.model.appender.annotations.AppenderEventManager;
 import com.untamedears.jukealert.util.JASettingsManager;
 import com.untamedears.jukealert.util.JukeAlertPermissionHandler;
 
@@ -31,9 +32,14 @@ public class JukeAlert extends ACivMod {
 	private LoggedActionFactory loggedActionFactory;
 	private JASettingsManager settingsManager;
 	private SnitchCullManager cullManager;
+	private AppenderEventManager appenderEventManager;
 
 	public JAConfigManager getConfigManager() {
 		return configManager;
+	}
+	
+	public AppenderEventManager getAppenderEventManager() {
+		return appenderEventManager;
 	}
 
 	public JASettingsManager getSettingsManager() {
@@ -94,6 +100,7 @@ public class JukeAlert extends ACivMod {
 		settingsManager = new JASettingsManager();
 		registerJukeAlertEvents();
 		JukeAlertPermissionHandler.setup();
+		this.appenderEventManager = new AppenderEventManager(this.getLogger(), snitchManager);
 	}
 
 	private void registerJukeAlertEvents() {

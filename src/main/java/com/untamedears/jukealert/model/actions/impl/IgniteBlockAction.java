@@ -8,12 +8,12 @@ import org.bukkit.inventory.ItemStack;
 
 import com.untamedears.jukealert.model.Snitch;
 import com.untamedears.jukealert.model.actions.LoggedActionPersistence;
-import com.untamedears.jukealert.model.actions.abstr.LoggablePlayerAction;
+import com.untamedears.jukealert.model.actions.abstr.SnitchAction;
 
 import vg.civcraft.mc.civmodcore.inventorygui.DecorationStack;
 import vg.civcraft.mc.civmodcore.inventorygui.IClickable;
 
-public class IgniteBlockAction extends LoggablePlayerAction  {
+public class IgniteBlockAction extends SnitchAction  {
 	
 	public static final String ID = "IGNITE_BLOCK";
 

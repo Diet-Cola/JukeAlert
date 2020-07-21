@@ -9,7 +9,7 @@ import org.bukkit.Material;
 
 import com.untamedears.jukealert.JukeAlert;
 import com.untamedears.jukealert.model.Snitch;
-import com.untamedears.jukealert.model.actions.abstr.LoggableAction;
+import com.untamedears.jukealert.model.actions.abstr.SnitchAction;
 import com.untamedears.jukealert.model.actions.impl.BlockBreakAction;
 import com.untamedears.jukealert.model.actions.impl.BlockPlaceAction;
 import com.untamedears.jukealert.model.actions.impl.DestroyVehicleAction;
@@ -29,7 +29,7 @@ import com.untamedears.jukealert.model.actions.impl.MountEntityAction;
 
 public class LoggedActionFactory {
 
-	private Map<String, LoggedActionProvider> providers;
+	private Map<String, SnitchActionProvider> providers;
 	private Map<String, Integer> identifierToInternal;
 
 	public LoggedActionFactory() {
@@ -38,7 +38,7 @@ public class LoggedActionFactory {
 		registerInternalProviders();
 	}
 
-	public void registerProvider(String identifier, LoggedActionProvider provider) {
+	public void registerProvider(String identifier, SnitchActionProvider provider) {
 		int internal = JukeAlert.getInstance().getDAO().getOrCreateActionID(identifier);
 		if (internal != -1) {
 			providers.put(identifier, provider);
@@ -46,8 +46,8 @@ public class LoggedActionFactory {
 		}
 	}
 
-	public LoggableAction produce(Snitch snitch, String id, UUID player, Location location, long time, String victim) {
-		LoggedActionProvider provider = providers.get(id);
+	public SnitchAction produce(Snitch snitch, String id, UUID player, Location location, long time, String victim) {
+		SnitchActionProvider provider = providers.get(id);
 		if (provider == null) {
 			return null;
 		}

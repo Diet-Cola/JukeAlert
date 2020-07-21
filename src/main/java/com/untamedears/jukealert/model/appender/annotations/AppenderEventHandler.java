@@ -17,15 +17,17 @@ import org.bukkit.event.EventPriority;
 public @interface AppenderEventHandler {
 	
 	/**
+	 * @return Priority at which this listener is called, order is identical to EventHandler, LOWEST --> HIGHEST --> MONITOR
+	 */
+	EventPriority priority() default EventPriority.NORMAL;
+	
+	/**
 	 * @return If ignoreCancelled is true and the event is cancelled, the method is
 	 *         not called. Otherwise, the method is always called
 	 */
 	boolean ignoreCancelled() default false;
 	
-	/**
-	 * @return Priority at which this listener is called, order is identical to EventHandler, LOWEST --> HIGHEST --> MONITOR
-	 */
-	EventPriority priority() default EventPriority.NORMAL;
+	
 	
 	
 }

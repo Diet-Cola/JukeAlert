@@ -32,8 +32,7 @@ import com.untamedears.jukealert.model.SnitchTypeManager;
 import com.untamedears.jukealert.model.actions.ActionCacheState;
 import com.untamedears.jukealert.model.actions.LoggedActionFactory;
 import com.untamedears.jukealert.model.actions.LoggedActionPersistence;
-import com.untamedears.jukealert.model.actions.abstr.LoggableAction;
-import com.untamedears.jukealert.model.actions.abstr.LoggablePlayerAction;
+import com.untamedears.jukealert.model.actions.abstr.SnitchAction;
 import com.untamedears.jukealert.model.appender.AbstractSnitchAppender;
 
 import vg.civcraft.mc.civmodcore.CivModCorePlugin;
@@ -381,12 +380,12 @@ public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 		}
 	}
 
-	public List<LoggableAction> loadLogs(Snitch snitch) {
+	public List<SnitchAction> loadLogs(Snitch snitch) {
 		int id = snitch.getId();
 		if (id == -1) {
 			throw new IllegalArgumentException("Id for loading logs can not be null");
 		}
-		List<LoggableAction> result = new ArrayList<>();
+		List<SnitchAction> result = new ArrayList<>();
 		LoggedActionFactory factory = JukeAlert.getInstance().getLoggedActionFactory();
 		try (Connection insertConn = db.getConnection();
 				PreparedStatement loadActions = insertConn.prepareStatement(
@@ -405,7 +404,7 @@ public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 					String victim = rs.getString(7);
 					int logId = rs.getInt(8);
 					Location loc = new Location(snitch.getLocation().getWorld(), x, y, z);
-					LoggableAction action = factory.produce(snitch, identifier, uuid, loc, time, victim);
+					SnitchAction action = factory.produce(snitch, identifier, uuid, loc, time, victim);
 					if (action != null) {
 						action.setID(logId);
 						result.add(action);
@@ -419,7 +418,7 @@ public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 		return result;
 	}
 
-	public void deleteLog(LoggableAction log) {
+	public void deleteLog(SnitchAction log) {
 		if (log.getID() == -1) {
 			return;
 		}
@@ -433,7 +432,7 @@ public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 		}
 	}
 
-	public void insertLogAsync(int typeID, Snitch snitch, LoggablePlayerAction action) {
+	public void insertLogAsync(int typeID, Snitch snitch, SnitchAction action) {
 		Bukkit.getScheduler().runTaskAsynchronously(JukeAlert.getInstance(), () -> {
 			insertLog(typeID, snitch, action.getPersistence());
 			action.setCacheState(ActionCacheState.NORMAL);
