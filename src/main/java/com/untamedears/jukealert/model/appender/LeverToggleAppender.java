@@ -8,7 +8,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.EventPriority;
 
 import com.untamedears.jukealert.JukeAlert;
-import com.untamedears.jukealert.events.LoggableActionEvent;
+import com.untamedears.jukealert.events.SnitchActionEvent;
 import com.untamedears.jukealert.model.Snitch;
 import com.untamedears.jukealert.model.appender.annotations.AppenderEventHandler;
 import com.untamedears.jukealert.model.appender.config.LeverToggleConfig;
@@ -32,7 +32,7 @@ public class LeverToggleAppender extends ConfigurableSnitchAppender<LeverToggleC
 	}
 
 	@AppenderEventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
-	public void acceptAction(LoggableActionEvent event) {
+	public void acceptAction(SnitchActionEvent event) {
 		if (!shouldToggle) {
 			return;
 		}

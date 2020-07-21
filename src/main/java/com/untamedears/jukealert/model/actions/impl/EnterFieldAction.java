@@ -2,11 +2,8 @@ package com.untamedears.jukealert.model.actions.impl;
 
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 
-import com.untamedears.jukealert.events.PlayerHitSnitchEvent;
-import com.untamedears.jukealert.model.Snitch;
 import com.untamedears.jukealert.model.actions.abstr.SnitchAction;
 
 import vg.civcraft.mc.civmodcore.inventorygui.DecorationStack;
@@ -16,8 +13,8 @@ public class EnterFieldAction extends SnitchAction {
 
 	public static final String ID = "ENTRY";
 
-	public EnterFieldAction(long time, Snitch snitch, UUID player) {
-		super(time, snitch, player);
+	public EnterFieldAction(long time, UUID player) {
+		super(time, player);
 	}
 
 	@Override

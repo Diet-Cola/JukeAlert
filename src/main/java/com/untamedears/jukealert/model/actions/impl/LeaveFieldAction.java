@@ -4,7 +4,6 @@ import java.util.UUID;
 
 import org.bukkit.inventory.ItemStack;
 
-import com.untamedears.jukealert.model.Snitch;
 import com.untamedears.jukealert.model.actions.abstr.SnitchAction;
 
 import vg.civcraft.mc.civmodcore.inventorygui.DecorationStack;
@@ -14,8 +13,8 @@ public class LeaveFieldAction extends SnitchAction {
 
 	public static final String ID = "LEAVE";
 
-	public LeaveFieldAction(long time, Snitch snitch, UUID player) {
-		super(time, snitch, player);
+	public LeaveFieldAction(long time, UUID player) {
+		super(time, player);
 	}
 
 	@Override

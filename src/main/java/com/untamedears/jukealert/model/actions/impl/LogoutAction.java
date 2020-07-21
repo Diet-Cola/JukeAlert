@@ -2,11 +2,9 @@ package com.untamedears.jukealert.model.actions.impl;
 
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 
-import com.untamedears.jukealert.model.Snitch;
 import com.untamedears.jukealert.model.actions.abstr.SnitchAction;
 
 import vg.civcraft.mc.civmodcore.inventorygui.DecorationStack;
@@ -16,8 +14,8 @@ public class LogoutAction extends SnitchAction {
 
 	public static final String ID = "LOGOUT";
 
-	public LogoutAction(long time, Snitch snitch, UUID player) {
-		super(time, snitch, player);
+	public LogoutAction(long time, UUID player) {
+		super(time, player);
 	}
 
 	@Override

@@ -6,7 +6,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import com.untamedears.jukealert.model.Snitch;
 import com.untamedears.jukealert.model.actions.abstr.LoggablePlayerVictimAction;
 
 import vg.civcraft.mc.civmodcore.api.ItemNames;
@@ -17,8 +16,8 @@ public class EnterVehicleAction extends LoggablePlayerVictimAction {
 
 	public static final String ID = "ENTER_VEHICLE";
 	
-	public EnterVehicleAction(long time, Snitch snitch, UUID player, Location location, String victim) {
-		super(time, snitch, player, location, victim);
+	public EnterVehicleAction(long time, UUID player, Location location, String victim) {
+		super(time, player, location, victim);
 	}
 
 	@Override

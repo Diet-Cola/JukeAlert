@@ -22,21 +22,27 @@ import vg.civcraft.mc.civmodcore.api.ItemAPI;
 import vg.civcraft.mc.civmodcore.inventorygui.IClickable;
 import vg.civcraft.mc.namelayer.NameAPI;
 
-public abstract class SnitchAction {
+public abstract class SnitchAction implements Cloneable {
 	
 	private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
 	protected final long time;
-	protected final Snitch snitch;
+	protected Snitch snitch;
 	protected final UUID player;
 	private ActionCacheState state;
 	private int id;
 
-	public SnitchAction(long time, Snitch snitch, UUID player) {
+	public SnitchAction(long time, UUID player) {
 		this.time = time;
-		this.snitch = snitch;
 		this.player = player;
 		state = ActionCacheState.NEW;
+	}
+	
+	public void setSnitch(Snitch snitch) {
+		if (this.snitch != null) {
+			throw new IllegalStateException();
+		}
+		this.snitch = snitch;
 	}
 
 	/**

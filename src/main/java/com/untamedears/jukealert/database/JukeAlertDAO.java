@@ -404,8 +404,9 @@ public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 					String victim = rs.getString(7);
 					int logId = rs.getInt(8);
 					Location loc = new Location(snitch.getLocation().getWorld(), x, y, z);
-					SnitchAction action = factory.produce(snitch, identifier, uuid, loc, time, victim);
+					SnitchAction action = factory.produce(identifier, uuid, loc, time, victim);
 					if (action != null) {
+						action.setSnitch(snitch);
 						action.setID(logId);
 						result.add(action);
 					}

@@ -4,11 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-
-import vg.civcraft.mc.citadel.model.Reinforcement;
 
 public class PlayerEnterCoreFieldEvent extends PlayerEvent implements Cancellable {
 	

@@ -6,7 +6,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import com.untamedears.jukealert.model.Snitch;
 import com.untamedears.jukealert.model.actions.abstr.LoggablePlayerVictimAction;
 
 import vg.civcraft.mc.civmodcore.inventorygui.DecorationStack;
@@ -16,8 +15,8 @@ public class KillLivingEntityAction extends LoggablePlayerVictimAction {
 	
 	public static final String ID = "KILL_MOB";
 
-	public KillLivingEntityAction(long time, Snitch snitch, UUID player, Location location,String victimName) {
-		super(time, snitch, player, location, victimName);
+	public KillLivingEntityAction(long time, UUID player, Location location,String victimName) {
+		super(time, player, location, victimName);
 	}
 
 	@Override

@@ -7,7 +7,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import com.untamedears.jukealert.model.Snitch;
 import com.untamedears.jukealert.model.actions.LoggedActionPersistence;
 import com.untamedears.jukealert.util.JAUtility;
 
@@ -21,8 +20,8 @@ public abstract class LoggableBlockAction extends SnitchAction {
 	protected final Location location;
 	protected final Material material;
 
-	public LoggableBlockAction(long time, Snitch snitch, UUID player, Location location, Material material) {
-		super(time, snitch, player);
+	public LoggableBlockAction(long time, UUID player, Location location, Material material) {
+		super(time, player);
 		this.location = location;
 		this.material = material;
 	}

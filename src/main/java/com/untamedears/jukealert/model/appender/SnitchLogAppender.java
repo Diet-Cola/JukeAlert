@@ -9,7 +9,7 @@ import org.bukkit.event.EventPriority;
 
 import com.untamedears.jukealert.JukeAlert;
 import com.untamedears.jukealert.database.JukeAlertDAO;
-import com.untamedears.jukealert.events.LoggableActionEvent;
+import com.untamedears.jukealert.events.SnitchActionEvent;
 import com.untamedears.jukealert.model.Snitch;
 import com.untamedears.jukealert.model.actions.ActionCacheState;
 import com.untamedears.jukealert.model.actions.LoggedActionFactory;
@@ -39,7 +39,7 @@ public class SnitchLogAppender extends ConfigurableSnitchAppender<LimitedActionT
 	}
 
 	@AppenderEventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void acceptAction(LoggableActionEvent event) {
+	public void acceptAction(SnitchActionEvent event) {
 		SnitchAction log = event.getAction();
 		if (!config.isTrigger(log.getIdentifier())) {
 			return;

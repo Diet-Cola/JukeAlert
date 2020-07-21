@@ -4,9 +4,9 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.EventPriority;
 
 import com.untamedears.jukealert.JukeAlert;
-import com.untamedears.jukealert.events.PlayerMoveBlockEvent;
 import com.untamedears.jukealert.events.CoreDestroyEvent;
 import com.untamedears.jukealert.events.CoreDestroyEvent.Cause;
+import com.untamedears.jukealert.events.PlayerMoveBlockEvent;
 import com.untamedears.jukealert.model.Snitch;
 import com.untamedears.jukealert.model.appender.annotations.AppenderEventHandler;
 import com.untamedears.jukealert.model.appender.config.DormantCullingConfig;

@@ -6,7 +6,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import com.untamedears.jukealert.model.Snitch;
 import com.untamedears.jukealert.model.actions.abstr.LoggablePlayerVictimAction;
 
 import vg.civcraft.mc.civmodcore.inventorygui.DecorationStack;
@@ -16,8 +15,8 @@ public class DismountEntityAction extends LoggablePlayerVictimAction {
 	
 	public static final String ID = "DISMOUNT_ENTITY";
 
-	public DismountEntityAction(long time, Snitch snitch, UUID player, Location location, String victim) {
-		super(time, snitch, player, location, victim);
+	public DismountEntityAction(long time, UUID player, Location location, String victim) {
+		super(time, player, location, victim);
 	}
 
 	@Override

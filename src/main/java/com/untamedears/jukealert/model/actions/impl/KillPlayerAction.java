@@ -6,7 +6,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import com.untamedears.jukealert.model.Snitch;
 import com.untamedears.jukealert.model.actions.abstr.LoggablePlayerVictimAction;
 
 import vg.civcraft.mc.civmodcore.api.ItemAPI;
@@ -18,8 +17,8 @@ public class KillPlayerAction extends LoggablePlayerVictimAction {
 	
 	public static final String ID = "KILL_PLAYER";
 
-	public KillPlayerAction(long time, Snitch snitch, UUID player, Location location, UUID victim) {
-		super(time, snitch, player, location, victim.toString());
+	public KillPlayerAction(long time, UUID player, Location location, UUID victim) {
+		super(time, player, location, victim.toString());
 	}
 	
 	public String getVictimName() {

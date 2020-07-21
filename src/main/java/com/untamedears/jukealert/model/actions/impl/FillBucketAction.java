@@ -5,15 +5,14 @@ import java.util.UUID;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
-import com.untamedears.jukealert.model.Snitch;
 import com.untamedears.jukealert.model.actions.abstr.LoggableBlockAction;
 
 public class FillBucketAction extends LoggableBlockAction {
 	
 	public static final String ID = "FILL_BUCKET";
 
-	public FillBucketAction(long time, Snitch snitch, UUID player, Location location, Material material) {
-		super(time, snitch, player, location, material);
+	public FillBucketAction(long time, UUID player, Location location, Material material) {
+		super(time, player, location, material);
 	}
 
 	@Override

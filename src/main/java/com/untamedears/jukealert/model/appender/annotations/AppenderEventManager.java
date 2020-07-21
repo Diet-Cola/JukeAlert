@@ -6,7 +6,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,10 +44,12 @@ public class AppenderEventManager {
 	private Map<EventClassPrioTuple, List<MethodAppenderTuple>> eventsToAppenders;
 	private Logger logger;
 	private SnitchManager snitchManager;
+	private EventLocationResolver locationResolver;
 
 	public AppenderEventManager(Logger logger, SnitchManager snitchManager) {
 		this.eventsToAppenders = new HashMap<>();
 		this.logger = logger;
+		this.locationResolver = new EventLocationResolver();
 		this.snitchManager = snitchManager;
 	}
 
@@ -83,6 +84,11 @@ public class AppenderEventManager {
 			relevantAppenderTypes = handlers;
 		}
 		if (relevantAppenderTypes.isEmpty()) {
+			return;
+		}
+		Location location = locationResolver.getLocation(event);
+		if (location == null) {
+			logger.severe("Failed to retrieve location for further processing of " + event);
 			return;
 		}
 		Set<Snitch> snitchesCovering = snitchManager.getSnitchesCovering(location);

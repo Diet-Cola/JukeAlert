@@ -8,8 +8,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
-import java.util.function.Function;
+import java.util.function.Supplier;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -41,6 +42,7 @@ import org.spigotmc.event.entity.EntityDismountEvent;
 import org.spigotmc.event.entity.EntityMountEvent;
 
 import com.untamedears.jukealert.SnitchManager;
+import com.untamedears.jukealert.events.SnitchActionEvent;
 import com.untamedears.jukealert.model.Snitch;
 import com.untamedears.jukealert.model.actions.abstr.SnitchAction;
 import com.untamedears.jukealert.model.actions.impl.BlockBreakAction;
@@ -108,14 +110,14 @@ public class LoggableActionListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onBlockPlace(BlockPlaceEvent event) {
-		handlePlayerAction(event.getPlayer(), s -> new BlockPlaceAction(System.currentTimeMillis(), s,
-				event.getPlayer().getUniqueId(), event.getBlock().getLocation(), event.getBlock().getType()));
+		callEvent(() -> new BlockPlaceAction(System.currentTimeMillis(), 
+				event.getPlayer().getUniqueId(), event.getBlock().getLocation(), event.getBlock().getType()), event.getBlock().getLocation());
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onBlockBreak(BlockBreakEvent event) {
-		handlePlayerAction(event.getPlayer(), s -> new BlockBreakAction(System.currentTimeMillis(), s,
-				event.getPlayer().getUniqueId(), event.getBlock().getLocation(), event.getBlock().getType()));
+		callEvent(() -> new BlockBreakAction(System.currentTimeMillis(), 
+				event.getPlayer().getUniqueId(), event.getBlock().getLocation(), event.getBlock().getType()), event.getBlock().getLocation());
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -126,12 +128,12 @@ public class LoggableActionListener implements Listener {
 		}
 		Player killer = victim.getKiller();
 		if (victim.getType() == EntityType.PLAYER) {
-			handlePlayerAction(killer, s -> new KillPlayerAction(System.currentTimeMillis(), s, killer.getUniqueId(),
+			handlePlayerAction(killer, () -> new KillPlayerAction(System.currentTimeMillis(),  killer.getUniqueId(),
 					victim.getLocation(), victim.getUniqueId()));
 			return;
 		}
 		String victimName = getEntityName(victim);
-		handlePlayerAction(killer, s -> new KillLivingEntityAction(System.currentTimeMillis(), s, killer.getUniqueId(),
+		handlePlayerAction(killer, () -> new KillLivingEntityAction(System.currentTimeMillis(), killer.getUniqueId(),
 				victim.getLocation(), victimName));
 	}
 
@@ -140,10 +142,8 @@ public class LoggableActionListener implements Listener {
 		if (event.getAttacker() == null || event.getAttacker().getType() != EntityType.PLAYER) {
 			return;
 		}
-
 		Player player = (Player) event.getAttacker();
-
-		handlePlayerAction(player, s -> new DestroyVehicleAction(System.currentTimeMillis(), s,
+		handlePlayerAction(player, () -> new DestroyVehicleAction(System.currentTimeMillis(),
 				player.getUniqueId(), event.getVehicle().getLocation(), getEntityName(event.getVehicle())));
 	}
 
@@ -152,10 +152,9 @@ public class LoggableActionListener implements Listener {
 		if (event.getEntered().getType() != EntityType.PLAYER) {
 			return;
 		}
-
 		Player player = (Player) event.getEntered();
 
-		handlePlayerAction(player, s -> new EnterVehicleAction(System.currentTimeMillis(), s,
+		handlePlayerAction(player, () -> new EnterVehicleAction(System.currentTimeMillis(),
 				player.getUniqueId(), event.getVehicle().getLocation(), getEntityName(event.getVehicle())));
 	}
 
@@ -164,22 +163,24 @@ public class LoggableActionListener implements Listener {
 		if (event.getExited().getType() != EntityType.PLAYER) {
 			return;
 		}
-
+		if (event.getVehicle() instanceof LivingEntity) {
+			return; //handled by dismount
+		}
 		Player player = (Player) event.getExited();
 
-		handlePlayerAction(player, s -> new ExitVehicleAction(System.currentTimeMillis(), s,
+		handlePlayerAction(player, () -> new ExitVehicleAction(System.currentTimeMillis(),
 				player.getUniqueId(), event.getVehicle().getLocation(), getEntityName(event.getVehicle())));
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onEmptyBucket(PlayerBucketEmptyEvent event) {
-		handlePlayerAction(event.getPlayer(), s -> new EmptyBucketAction(System.currentTimeMillis(), s,
+		handlePlayerAction(event.getPlayer(), () -> new EmptyBucketAction(System.currentTimeMillis(),
 				event.getPlayer().getUniqueId(), event.getBlock().getLocation(), event.getBucket()));
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onFillBucket(PlayerBucketFillEvent event) {
-		handlePlayerAction(event.getPlayer(), s -> new FillBucketAction(System.currentTimeMillis(), s,
+		handlePlayerAction(event.getPlayer(), () -> new FillBucketAction(System.currentTimeMillis(),
 				event.getPlayer().getUniqueId(), event.getBlock().getLocation(), event.getBlockClicked().getType()));
 	}
 
@@ -190,7 +191,7 @@ public class LoggableActionListener implements Listener {
 		}
 		Player player = (Player) event.getEntity();
 		String mountName = getEntityName(event.getMount());
-		handlePlayerAction(player, s -> new MountEntityAction(System.currentTimeMillis(), s, player.getUniqueId(),
+		handlePlayerAction(player, () -> new MountEntityAction(System.currentTimeMillis(), player.getUniqueId(),
 				event.getMount().getLocation(), mountName));
 	}
 
@@ -201,7 +202,7 @@ public class LoggableActionListener implements Listener {
 		}
 		Player player = (Player) event.getEntity();
 		String mountName = getEntityName(event.getDismounted());
-		handlePlayerAction(player, s -> new DismountEntityAction(System.currentTimeMillis(), s, player.getUniqueId(),
+		handlePlayerAction(player, () -> new DismountEntityAction(System.currentTimeMillis(), player.getUniqueId(),
 				event.getDismounted().getLocation(), mountName));
 	}
 
@@ -213,7 +214,7 @@ public class LoggableActionListener implements Listener {
 		}
 		BlockInventoryHolder blockHolder = (BlockInventoryHolder) holder;
 		Player player = (Player) event.getPlayer();
-		handlePlayerAction(player, s -> new OpenContainerAction(System.currentTimeMillis(), s, player.getUniqueId(),
+		handlePlayerAction(player, () -> new OpenContainerAction(System.currentTimeMillis(), player.getUniqueId(),
 				blockHolder.getBlock().getLocation(), blockHolder.getBlock().getType()));
 	}
 
@@ -221,7 +222,7 @@ public class LoggableActionListener implements Listener {
 	public void playerJoinEvent(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 		Set <Snitch> covering = new HashSet<>(snitchManager.getSnitchesCovering(event.getPlayer().getLocation()));
-		handlePlayerAction(player, s -> new LoginAction(System.currentTimeMillis(), s, player.getUniqueId()));
+		handlePlayerAction(player, () -> new LoginAction(System.currentTimeMillis(), player.getUniqueId()));
 		insideFields.put(event.getPlayer().getUniqueId(),covering);
 	}
 
@@ -242,24 +243,12 @@ public class LoggableActionListener implements Listener {
 			return;
 		}
 		Player player = event.getPlayer();
-		handlePlayerAction(player, s -> new IgniteBlockAction(System.currentTimeMillis(), s, player.getUniqueId(),
+		handlePlayerAction(player, () -> new IgniteBlockAction(System.currentTimeMillis(),  player.getUniqueId(),
 				event.getBlock().getLocation()));
 	}
 
 	private void handleSnitchLogout(Player player) {
-		handlePlayerAction(player, s -> new LogoutAction(System.currentTimeMillis(), s, player.getUniqueId()));
-	}
-
-	private void handlePlayerAction(Player player, Function<Snitch, SnitchAction> actionCreator) {
-		if (isPlayerSnitchImmune(player)) {
-			return;
-		}
-		Collection<Snitch> snitches = snitchManager.getSnitchesCovering(player.getLocation());
-		for (Snitch snitch : snitches) {
-			if (!snitch.hasPermission(player, JukeAlertPermissionHandler.getSnitchImmune())) {
-				snitch.processAction(actionCreator.apply(snitch));
-			}
-		}
+		handlePlayerAction(player, () -> new LogoutAction(System.currentTimeMillis(), player.getUniqueId()));
 	}
 
 	private void handleSnitchEntry(Player player, Location location) {
@@ -283,6 +272,10 @@ public class LoggableActionListener implements Listener {
 		});
 		// need to do this afterwards to avoid ConcurrentModificationExceptions
 		previouslyIn.removeAll(toRemove);
+	}
+	
+	private void callEvent(Supplier<SnitchAction> actionSupplier, Location location) {
+		Bukkit.getPluginManager().callEvent(new SnitchActionEvent(actionSupplier, location));
 	}
 
 	private boolean isPlayerSnitchImmune(Player player) {

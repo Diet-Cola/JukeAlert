@@ -1,7 +1,6 @@
 package com.untamedears.jukealert.model.appender;
 
 import com.untamedears.jukealert.model.Snitch;
-import com.untamedears.jukealert.model.actions.abstr.SnitchAction;
 
 /**
  * Adds some kind of functionality to a snitch

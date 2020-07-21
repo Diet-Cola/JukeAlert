@@ -2,23 +2,23 @@ package com.untamedears.jukealert.model.appender;
 
 import java.util.UUID;
 
-import com.untamedears.jukealert.util.JAUtility;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 
 import com.untamedears.jukealert.JukeAlert;
-import com.untamedears.jukealert.events.LoggableActionEvent;
+import com.untamedears.jukealert.events.SnitchActionEvent;
 import com.untamedears.jukealert.model.Snitch;
 import com.untamedears.jukealert.model.actions.abstr.SnitchAction;
 import com.untamedears.jukealert.model.appender.annotations.AppenderEventHandler;
 import com.untamedears.jukealert.model.appender.config.LimitedActionTriggerConfig;
 import com.untamedears.jukealert.util.JASettingsManager;
+import com.untamedears.jukealert.util.JAUtility;
 import com.untamedears.jukealert.util.JukeAlertPermissionHandler;
+
+import net.md_5.bungee.api.chat.TextComponent;
 
 public class BroadcastEntryAppender extends ConfigurableSnitchAppender<LimitedActionTriggerConfig> {
 
@@ -29,7 +29,7 @@ public class BroadcastEntryAppender extends ConfigurableSnitchAppender<LimitedAc
 	}
 
 	@AppenderEventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void onAction(LoggableActionEvent event) {
+	public void onAction(SnitchActionEvent event) {
 		SnitchAction log = event.getAction();
 		if (snitch.hasPermission(log.getPlayer(), JukeAlertPermissionHandler.getSnitchImmune())) {
 			return;

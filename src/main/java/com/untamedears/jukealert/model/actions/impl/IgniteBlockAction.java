@@ -6,7 +6,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import com.untamedears.jukealert.model.Snitch;
 import com.untamedears.jukealert.model.actions.LoggedActionPersistence;
 import com.untamedears.jukealert.model.actions.abstr.SnitchAction;
 
@@ -19,8 +18,8 @@ public class IgniteBlockAction extends SnitchAction  {
 
 	private Location location;
 	
-	public IgniteBlockAction(long time, Snitch snitch, UUID player, Location location) {
-		super(time, snitch, player);
+	public IgniteBlockAction(long time, UUID player, Location location) {
+		super(time, player);
 		this.location = location;
 	}
 
