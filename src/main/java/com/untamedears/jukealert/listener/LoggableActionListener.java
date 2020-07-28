@@ -274,7 +274,7 @@ public class LoggableActionListener implements Listener {
 		previouslyIn.removeAll(toRemove);
 	}
 	
-	private void callEvent(Supplier<SnitchAction> actionSupplier, Location location) {
+	private static void callEvent(Supplier<SnitchAction> actionSupplier, Location location) {
 		Bukkit.getPluginManager().callEvent(new SnitchActionEvent(actionSupplier, location));
 	}
 
@@ -282,7 +282,7 @@ public class LoggableActionListener implements Listener {
 		return player.hasPermission("jukealert.vanish");
 	}
 
-	private String getEntityName(Entity entity) {
+	private static String getEntityName(Entity entity) {
 		if (entity.getCustomName() != null) {
 			return entity.getCustomName();
 		} else {

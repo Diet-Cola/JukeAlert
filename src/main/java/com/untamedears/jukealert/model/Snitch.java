@@ -194,7 +194,7 @@ public class Snitch extends LocationTrackable {
 	 * Checks whether both the block and the reinforcement of the snitch still exist and deletes it if not
 	 */
 	public boolean checkPhysicalIntegrity() {
-		Reinforcement rein = ReinforcementLogic.getReinforcementAt(getLocation());
+		Reinforcement rein = getReinforcement();
 		if (rein == null) {
 			//no reinforcement at all
 			destroy(null, CoreDestroyEvent.Cause.CLEANUP);
@@ -212,6 +212,10 @@ public class Snitch extends LocationTrackable {
 			return false;
 		}
 		return true;
+	}
+	
+	public Reinforcement getReinforcement() {
+		return ReinforcementLogic.getReinforcementAt(getLocation());
 	}
 	
 	/**

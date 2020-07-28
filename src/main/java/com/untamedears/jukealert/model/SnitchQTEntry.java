@@ -12,7 +12,14 @@ public class SnitchQTEntry extends QTBoxImpl {
 		super(loc, range);
 		this.snitch = snitch;
 	}
-	
+
+	public SnitchQTEntry(Snitch snitch, Location center, int lowerXRange, int upperXRange, int lowerZRange,
+			int upperZRange) {
+		super(center.getBlockX() - lowerXRange, center.getBlockX() + upperXRange, center.getBlockZ() - lowerZRange,
+				center.getBlockZ() + upperZRange);
+		this.snitch = snitch;
+	}
+
 	public Snitch getSnitch() {
 		return snitch;
 	}

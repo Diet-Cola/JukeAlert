@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bukkit.configuration.ConfigurationSection;
@@ -21,6 +22,9 @@ import com.untamedears.jukealert.model.appender.DormantCullingAppender;
 import com.untamedears.jukealert.model.appender.LeverToggleAppender;
 import com.untamedears.jukealert.model.appender.ShowOwnerOnDestroyAppender;
 import com.untamedears.jukealert.model.appender.SnitchLogAppender;
+import com.untamedears.jukealert.model.field.CuboidRangeManager;
+import com.untamedears.jukealert.model.field.CylinderRangeManager;
+import com.untamedears.jukealert.model.field.FieldManager;
 
 public class SnitchTypeManager {
 
@@ -41,8 +45,8 @@ public class SnitchTypeManager {
 		registerAppenderType(LeverToggleAppender.ID, LeverToggleAppender.class);
 		registerAppenderType(DormantCullingAppender.ID, DormantCullingAppender.class);
 		registerAppenderType(ShowOwnerOnDestroyAppender.ID, ShowOwnerOnDestroyAppender.class);
-	} 
-	
+	}
+
 	public Set<Class<? extends AbstractSnitchAppender>> getAllAppenderTypes() {
 		return new HashSet<>(appenderClasses.values());
 	}
@@ -69,19 +73,12 @@ public class SnitchTypeManager {
 			return false;
 		}
 		String name = config.getString("name");
-		if (!config.isInt("range")) {
-			logger.warning("Snitch type at " + config.getCurrentPath() + " had no range specified");
-			return false;
-		}
 		sb.append("Successfully parsed type ");
 		sb.append(name);
 		sb.append(" with id: ");
 		sb.append(id);
 		sb.append(", item: ");
 		sb.append(item.toString());
-		int range = config.getInt("range");
-		sb.append(", range: ");
-		sb.append(range);
 		sb.append(", appenders: ");
 		List<Function<Snitch, AbstractSnitchAppender>> appenderInstanciations = new ArrayList<>();
 		if (config.isConfigurationSection("appender")) {
@@ -99,21 +96,90 @@ public class SnitchTypeManager {
 					return false;
 				}
 				ConfigurationSection entrySection = appenderSection.getConfigurationSection(key);
-				Function<Snitch, AbstractSnitchAppender> instanciation = getAppenderInstanciation(
-						appenderClass, entrySection);
+				Function<Snitch, AbstractSnitchAppender> instanciation = getAppenderInstanciation(appenderClass,
+						entrySection);
 				appenderInstanciations.add(instanciation);
 				sb.append(appenderClass.getSimpleName());
 				sb.append("   ");
 			}
 		}
 		if (appenderInstanciations.isEmpty()) {
-			logger.warning("Snitch config at "  + config.getCurrentPath() + " has no appenders, this is likely not what you intended");
+			logger.warning("Snitch config at " + config.getCurrentPath()
+					+ " has no appenders, this is likely not what you intended");
 		}
-		SnitchFactoryType configFactory = new SnitchFactoryType(item, range, name, id, appenderInstanciations);
+		Function<Snitch, FieldManager> fieldFunction = parseFieldManager(config.getConfigurationSection("field"));
+		if (fieldFunction == null) {
+			return false;
+		}
+		SnitchFactoryType configFactory = new SnitchFactoryType(item, name, id, appenderInstanciations, fieldFunction);
 		configFactoriesById.put(configFactory.getID(), configFactory);
 		configFactoriesByItem.put(configFactory.getItem(), configFactory);
 		logger.info(sb.toString());
 		return true;
+	}
+
+	private static Function<Snitch, FieldManager> parseFieldManager(ConfigurationSection config) {
+		if (config == null) {
+			return null;
+		}
+		int lowerY;
+		if ((lowerY = readRange(config, "y_range", "lower_y_range")) == -1) {
+			return null;
+		}
+		int upperY;
+		if ((upperY = readRange(config, "y_range", "upper_y_range")) == -1) {
+			return null;
+		}
+		switch (config.getString("type", "not_specified").toUpperCase()) {
+		case "CUBOID":
+		case "CUBE":
+			int lowerX;
+			if ((lowerX = readRange(config, "x_range", "lower_x_range")) == -1) {
+				return null;
+			}
+			int upperX;
+			if ((upperX = readRange(config, "x_range", "upper_x_range")) == -1) {
+				return null;
+			}
+			int lowerZ;
+			if ((lowerZ = readRange(config, "z_range", "lower_z_range")) == -1) {
+				return null;
+			}
+			int upperZ;
+			if ((upperZ = readRange(config, "z_range", "upper_z_range")) == -1) {
+				return null;
+			}
+			return s -> new CuboidRangeManager(s, lowerX, upperX, lowerY, upperY, lowerZ, upperZ);
+		case "CYLINDER":
+			int radius = config.getInt("radius", -1);
+			if (radius == -1) {
+				JukeAlert.getInstance().getLogger()
+						.severe("Failed to find radius for field at " + config.getCurrentPath());
+				return null;
+			}
+			return s -> new CylinderRangeManager(s, radius, lowerY, upperY);
+		default:
+			JukeAlert.getInstance().getLogger().severe("Unrecognized field type at " + config.getCurrentPath());
+			return null;
+		}
+	}
+
+	private static int readRange(ConfigurationSection config, String iden2, String iden3) {
+		int range = 1;
+		range = config.getInt("range", range);
+		range = config.getInt(iden2, range);
+		range = config.getInt(iden3, range);
+		if (range < 0) {
+			JukeAlert.getInstance().getLogger().log(Level.SEVERE,
+					"Failed to find valid value for range " + iden3 + " at " + config.getCurrentPath());
+			return -1;
+		}
+		if (range > 10_000_000) {
+			JukeAlert.getInstance().getLogger().log(Level.SEVERE,
+					"Range of " + range + " at " + config.getCurrentPath() + " is too big");
+			return -1;
+		}
+		return range;
 	}
 
 	/**
@@ -127,11 +193,11 @@ public class SnitchTypeManager {
 	private Function<Snitch, AbstractSnitchAppender> getAppenderInstanciation(
 			Class<? extends AbstractSnitchAppender> clazz, ConfigurationSection config) {
 		try {
-			Constructor<? extends AbstractSnitchAppender> constructor = clazz
-					.getConstructor(Snitch.class, ConfigurationSection.class);
+			Constructor<? extends AbstractSnitchAppender> constructor = clazz.getConstructor(Snitch.class,
+					ConfigurationSection.class);
 			return s -> {
 				try {
-					return constructor.newInstance(s,config);
+					return constructor.newInstance(s, config);
 				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 						| InvocationTargetException e) {
 					e.printStackTrace();
@@ -140,7 +206,8 @@ public class SnitchTypeManager {
 			};
 		} catch (NoSuchMethodException | SecurityException e) {
 			// no config section constructor, which is fine if the appender does not have
-			// any parameter, in which case it only has a constructor with the snitch as parameter
+			// any parameter, in which case it only has a constructor with the snitch as
+			// parameter
 			try {
 				Constructor<? extends AbstractSnitchAppender> constructor = clazz.getConstructor(Snitch.class);
 				return s -> {

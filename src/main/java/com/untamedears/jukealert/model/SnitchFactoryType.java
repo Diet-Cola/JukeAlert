@@ -2,33 +2,34 @@ package com.untamedears.jukealert.model;
 
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 
 import com.untamedears.jukealert.model.appender.AbstractSnitchAppender;
-import com.untamedears.jukealert.model.field.SingleCuboidRangeManager;
+import com.untamedears.jukealert.model.field.FieldManager;
 
 public class SnitchFactoryType {
 
 	private final int id;
 	private final ItemStack item;
 	private final String name;
-	private final int range;
 
 	private final List<Function<Snitch, AbstractSnitchAppender>> appenders;
+	private final Function<Snitch, FieldManager> fieldManagerSupplier;
 
-	public SnitchFactoryType(ItemStack item, int range, String name, int id,
-			List<Function<Snitch, AbstractSnitchAppender>> appenders) {
+	public SnitchFactoryType(ItemStack item, String name, int id,
+			List<Function<Snitch, AbstractSnitchAppender>> appenders, Function<Snitch, FieldManager> fieldManagerSupplier) {
 		this.item = item;
 		this.name = name;
 		this.id = id;
-		this.range = range;
 		this.appenders = appenders;
+		this.fieldManagerSupplier = fieldManagerSupplier;
 	}
 
 	public Snitch create(int snitchID, Location location, String name, int groupID, boolean isNew) {
-		Snitch snitch = new Snitch(snitchID, location, isNew, groupID, s -> new SingleCuboidRangeManager(range, s),
+		Snitch snitch = new Snitch(snitchID, location, isNew, groupID,fieldManagerSupplier,
 				this, name);
 		for(Function<Snitch, AbstractSnitchAppender> appenderFunc : appenders) {
 			AbstractSnitchAppender appender = appenderFunc.apply(snitch);
