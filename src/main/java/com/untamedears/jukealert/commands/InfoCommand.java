@@ -25,7 +25,6 @@ import com.untamedears.jukealert.util.JukeAlertPermissionHandler;
 import net.md_5.bungee.api.chat.TextComponent;
 import vg.civcraft.mc.civmodcore.command.CivCommand;
 import vg.civcraft.mc.civmodcore.command.StandaloneCommand;
-import vg.civcraft.mc.namelayer.NameAPI;
 
 @CivCommand(id = "jainfo")
 public class InfoCommand extends StandaloneCommand {
@@ -35,7 +34,7 @@ public class InfoCommand extends StandaloneCommand {
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
 		Player player = (Player) sender;
-		Snitch snitch = findLookingAtOrClosestSnitch(player, JukeAlertPermissionHandler.getReadLogs());
+		Snitch snitch = findLookingAtOrClosestSnitch(player, JukeAlert.getInstance().getPermissionHandler().getReadLogs());
 		if (snitch == null) {
 			player.sendMessage(
 					ChatColor.RED + " You do not own any snitches nearby or lack permission to view their logs!");
@@ -58,7 +57,7 @@ public class InfoCommand extends StandaloneCommand {
 			}
 		}
 		int pageLength = JukeAlert.getInstance().getSettingsManager().getJaInfoLength(player.getUniqueId());
-		sendSnitchLog(player, snitch, offset, pageLength, filterAction, filterPlayer);
+		sendSnitchLog(player, snitch, offset, pageLength, filterAction, null);
 		return true;
 	}
 
@@ -66,12 +65,8 @@ public class InfoCommand extends StandaloneCommand {
 			String filterPlayerName) {
 		SnitchLogAppender logAppender = (SnitchLogAppender) snitch.getAppender(SnitchLogAppender.class);
 		List<LoggableAction> logs = new ArrayList<>(logAppender.getFullLogs());
-		if (filterPlayerName != null) {
-			UUID filterUUID = NameAPI.getUUID(filterPlayerName);
-			if (filterUUID == null) {
-				player.sendMessage(ChatColor.RED + filterPlayerName + " is not a player");
-				return;
-			}
+		if (filterPlayerName != null) { //disabled because name lookup has to be done async
+			UUID filterUUID = null;
 			List<LoggableAction> logCopy = new LinkedList<>();
 			for (LoggableAction log : logs) {
 				if (!((SnitchAction) log).hasPlayer()) {

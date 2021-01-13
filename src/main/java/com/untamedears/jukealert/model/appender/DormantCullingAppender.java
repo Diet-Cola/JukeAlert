@@ -61,7 +61,7 @@ public class DormantCullingAppender extends ConfigurableSnitchAppender<DormantCu
 			return;
 		}
 		LoggablePlayerAction playerAction = (LoggablePlayerAction) action;
-		if (snitch.hasPermission(playerAction.getPlayer(), JukeAlertPermissionHandler.getListSnitches())) {
+		if (snitch.hasPermission(playerAction.getPlayer(), JukeAlert.getInstance().getPermissionHandler().getListSnitches())) {
 			refreshTimer();
 		}
 	}

@@ -9,6 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import com.github.maxopoly.artemis.NameAPI;
 import com.untamedears.jukealert.model.Snitch;
 import com.untamedears.jukealert.model.actions.ActionCacheState;
 import com.untamedears.jukealert.model.actions.LoggedActionPersistence;
@@ -16,7 +17,6 @@ import com.untamedears.jukealert.util.JAUtility;
 
 import net.md_5.bungee.api.chat.TextComponent;
 import vg.civcraft.mc.civmodcore.api.ItemAPI;
-import vg.civcraft.mc.namelayer.NameAPI;
 
 public abstract class LoggablePlayerAction extends PlayerAction implements LoggableAction {
 	
@@ -65,7 +65,7 @@ public abstract class LoggablePlayerAction extends PlayerAction implements Logga
 		Location referenceLoc = getLocationForStringRepresentation();
 		boolean sameWorld = JAUtility.isSameWorld(referenceLoc, reference);
 		TextComponent comp = new TextComponent(
-				String.format("%s%s  %s%s  ", ChatColor.GOLD, getChatRepresentationIdentifier(), ChatColor.GREEN, NameAPI.getCurrentName(getPlayer())));
+				String.format("%s%s  %s%s  ", ChatColor.GOLD, getChatRepresentationIdentifier(), ChatColor.GREEN, NameAPI.getName(getPlayer())));
 		if (live) {
 			comp.addExtra(JAUtility.genTextComponent(snitch));
 			comp.addExtra(String.format("  %s%s", ChatColor.YELLOW,

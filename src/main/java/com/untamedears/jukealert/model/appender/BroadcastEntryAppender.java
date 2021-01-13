@@ -31,7 +31,7 @@ public class BroadcastEntryAppender extends ConfigurableSnitchAppender<LimitedAc
 			return;
 		}
 		LoggablePlayerAction log = (LoggablePlayerAction) action;
-		if (snitch.hasPermission(log.getPlayer(), JukeAlertPermissionHandler.getSnitchImmune())) {
+		if (snitch.hasPermission(log.getPlayer(), JukeAlert.getInstance().getPermissionHandler().getSnitchImmune())) {
 			return;
 		}
 		if (!config.isTrigger(action.getIdentifier())) {
@@ -49,7 +49,7 @@ public class BroadcastEntryAppender extends ConfigurableSnitchAppender<LimitedAc
 			if (settings.doesIgnoreAlert(snitch.getGroup().getName(), uuid)) {
 				continue;
 			}
-			if (snitch.hasPermission(uuid, JukeAlertPermissionHandler.getSnitchAlerts())) {
+			if (snitch.hasPermission(uuid, JukeAlert.getInstance().getPermissionHandler().getSnitchAlerts())) {
 				TextComponent comp = log.getChatRepresentation(player.getLocation(), true);
 
 				if (settings.shouldShowDirections(uuid)) {

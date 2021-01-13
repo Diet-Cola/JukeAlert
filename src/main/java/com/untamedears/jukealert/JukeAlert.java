@@ -15,6 +15,7 @@ import com.untamedears.jukealert.util.JukeAlertPermissionHandler;
 import vg.civcraft.mc.civmodcore.ACivMod;
 import vg.civcraft.mc.civmodcore.locations.chunkmeta.api.ChunkMetaAPI;
 import vg.civcraft.mc.civmodcore.locations.chunkmeta.api.SingleBlockAPIView;
+import vg.civcraft.mc.namelayer.mc.NameLayerPlugin;
 
 public class JukeAlert extends ACivMod {
 
@@ -31,9 +32,14 @@ public class JukeAlert extends ACivMod {
 	private LoggedActionFactory loggedActionFactory;
 	private JASettingsManager settingsManager;
 	private SnitchCullManager cullManager;
+	private JukeAlertPermissionHandler permHandler;
 
 	public JAConfigManager getConfigManager() {
 		return configManager;
+	}
+	
+	public JukeAlertPermissionHandler getPermissionHandler() {
+		return permHandler;
 	}
 
 	public JASettingsManager getSettingsManager() {
@@ -92,8 +98,8 @@ public class JukeAlert extends ACivMod {
 		}
 		snitchManager = new SnitchManager(api);
 		settingsManager = new JASettingsManager();
+		permHandler = new JukeAlertPermissionHandler(NameLayerPlugin.getInstance().getGroupTracker().getPermissionTracker());
 		registerJukeAlertEvents();
-		JukeAlertPermissionHandler.setup();
 	}
 
 	private void registerJukeAlertEvents() {

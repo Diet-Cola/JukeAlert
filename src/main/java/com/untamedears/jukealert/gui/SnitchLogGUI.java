@@ -24,6 +24,7 @@ import vg.civcraft.mc.civmodcore.inventorygui.ClickableInventory;
 import vg.civcraft.mc.civmodcore.inventorygui.DecorationStack;
 import vg.civcraft.mc.civmodcore.inventorygui.IClickable;
 import vg.civcraft.mc.civmodcore.inventorygui.MultiPageView;
+import vg.civcraft.mc.namelayer.core.PermissionType;
 
 public class SnitchLogGUI {
 
@@ -55,12 +56,13 @@ public class SnitchLogGUI {
 
 	private IClickable constructClearClick() {
 		ItemStack is = new ItemStack(Material.TNT);
+		PermissionType clearPerm = JukeAlert.getInstance().getPermissionHandler().getClearLogs();
 		ItemAPI.setDisplayName(is, ChatColor.GOLD + "Clear all logs");
-		if (snitch.hasPermission(player, JukeAlertPermissionHandler.getClearLogs())) {
+		if (snitch.hasPermission(player, clearPerm)) {
 			return new Clickable(is) {
 				@Override
 				public void clicked(Player p) {
-					if (snitch.hasPermission(player, JukeAlertPermissionHandler.getClearLogs())) {
+					if (snitch.hasPermission(player, clearPerm)) {
 						logAppender.deleteLogs();
 						ClickableInventory.forceCloseInventory(player);
 					}
@@ -108,11 +110,12 @@ public class SnitchLogGUI {
 		ItemStack is = new ItemStack(Material.LEVER);
 		ItemAPI.setDisplayName(is, ChatColor.GOLD + "Toggle lever activation by redstone");
 		ItemAPI.addLore(is, ChatColor.AQUA + "Currently turned " + ((leverAppender.shouldToggle()) ? "on" : "off"));
-		if (snitch.hasPermission(player, JukeAlertPermissionHandler.getToggleLevers())) {
+		PermissionType togglePerm = JukeAlert.getInstance().getPermissionHandler().getClearLogs();
+		if (snitch.hasPermission(player, togglePerm)) {
 			return new Clickable(is) {
 				@Override
 				public void clicked(Player p) {
-					if (snitch.hasPermission(player, JukeAlertPermissionHandler.getToggleLevers())) {
+					if (snitch.hasPermission(player, togglePerm)) {
 						leverAppender.switchState();
 						p.sendMessage(ChatColor.GREEN + "Toggled lever activation "
 								+ (leverAppender.shouldToggle() ? "off" : "on"));

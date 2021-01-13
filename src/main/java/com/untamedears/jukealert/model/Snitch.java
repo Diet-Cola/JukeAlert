@@ -22,10 +22,9 @@ import vg.civcraft.mc.citadel.ReinforcementLogic;
 import vg.civcraft.mc.citadel.model.Reinforcement;
 import vg.civcraft.mc.civmodcore.locations.chunkmeta.CacheState;
 import vg.civcraft.mc.civmodcore.locations.global.LocationTrackable;
-import vg.civcraft.mc.namelayer.GroupManager;
-import vg.civcraft.mc.namelayer.NameAPI;
-import vg.civcraft.mc.namelayer.group.Group;
-import vg.civcraft.mc.namelayer.permission.PermissionType;
+import vg.civcraft.mc.namelayer.core.Group;
+import vg.civcraft.mc.namelayer.core.PermissionType;
+import vg.civcraft.mc.namelayer.mc.GroupAPI;
 
 public class Snitch extends LocationTrackable {
 
@@ -111,7 +110,7 @@ public class Snitch extends LocationTrackable {
 	 *         false otherwise
 	 */
 	public boolean hasPermission(UUID uuid, PermissionType permission) {
-		return NameAPI.getGroupManager().hasAccess(getGroup(), uuid, permission);
+		return GroupAPI.hasPermission(uuid, getGroup(), permission);
 	}
 
 	/**
@@ -138,7 +137,7 @@ public class Snitch extends LocationTrackable {
 	 * @return Group the snitch belongs to
 	 */
 	public Group getGroup() {
-		return GroupManager.getGroup(groupID);
+		return GroupAPI.getGroup(groupID);
 	}
 
 	/**
@@ -218,7 +217,8 @@ public class Snitch extends LocationTrackable {
 			destroy(null, Cause.CLEANUP);
 			return false;
 		}
-		if (!rein.getGroup().getGroupIds().contains(this.groupID)) {
+		Group reinGroup = rein.getGroup();
+		if (reinGroup.getPrimaryId() != this.groupID && !reinGroup.getSecondaryIds().contains(this.groupID)) {
 			//different group
 			destroy(null, Cause.CLEANUP);
 			return false;

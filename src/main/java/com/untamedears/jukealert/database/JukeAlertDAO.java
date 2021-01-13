@@ -24,6 +24,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 
+import com.github.maxopoly.artemis.NameAPI;
 import com.untamedears.jukealert.JukeAlert;
 import com.untamedears.jukealert.SnitchManager;
 import com.untamedears.jukealert.model.Snitch;
@@ -41,9 +42,8 @@ import vg.civcraft.mc.civmodcore.dao.ManagedDatasource;
 import vg.civcraft.mc.civmodcore.locations.chunkmeta.CacheState;
 import vg.civcraft.mc.civmodcore.locations.global.GlobalTrackableDAO;
 import vg.civcraft.mc.civmodcore.locations.global.WorldIDManager;
-import vg.civcraft.mc.namelayer.GroupManager;
-import vg.civcraft.mc.namelayer.NameAPI;
-import vg.civcraft.mc.namelayer.group.Group;
+import vg.civcraft.mc.namelayer.core.Group;
+import vg.civcraft.mc.namelayer.mc.GroupAPI;
 
 public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 
@@ -112,11 +112,11 @@ public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 							return false;
 						}
 						int snitchType = logging ? 1 : 0;
-						Group group = GroupManager.getGroup(groupName);
+						Group group = GroupAPI.getGroup(groupName);
 						if (group == null) {
 							continue;
 						}
-						int groupId = group.getGroupId();
+						int groupId = group.getPrimaryId();
 
 						insertSnitch.setInt(1, groupId);
 						insertSnitch.setInt(2, snitchType);
@@ -254,7 +254,7 @@ public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 			if (snitch.getGroup() == null) {
 				return;
 			}
-			int groupId = snitch.getGroup().getGroupId();
+			int groupId = snitch.getGroup().getPrimaryId();
 			insertSnitch.setInt(1, groupId);
 			insertSnitch.setInt(2, snitch.getType().getID());
 			insertSnitch.setInt(3, snitch.getLocation().getBlockX());
@@ -281,7 +281,7 @@ public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 		try (Connection insertConn = db.getConnection();
 				PreparedStatement updateSnitch = insertConn
 						.prepareStatement("update ja_snitches set name = ?, group_id = ? where id = ?;")) {
-			int groupId = snitch.getGroup() == null ? -1 : snitch.getGroup().getGroupId();
+			int groupId = snitch.getGroup() == null ? -1 : snitch.getGroup().getPrimaryId();
 			if (groupId == -1) {
 				delete(snitch);
 				snitch.setCacheState(CacheState.DELETED);

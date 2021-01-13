@@ -5,9 +5,9 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
+import com.github.maxopoly.artemis.NameAPI;
 import com.untamedears.jukealert.model.Snitch;
 
-import vg.civcraft.mc.namelayer.NameAPI;
 
 public abstract class PlayerAction extends SnitchAction {
 
@@ -37,7 +37,7 @@ public abstract class PlayerAction extends SnitchAction {
 	}
 
 	public String getPlayerName() {
-		return NameAPI.getCurrentName(player);
+		return NameAPI.getName(player);
 	}
 
 }

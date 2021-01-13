@@ -9,6 +9,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import com.untamedears.jukealert.JukeAlert;
 import com.untamedears.jukealert.model.Snitch;
 import com.untamedears.jukealert.util.JAUtility;
 import com.untamedears.jukealert.util.JukeAlertPermissionHandler;
@@ -16,6 +17,7 @@ import com.untamedears.jukealert.util.JukeAlertPermissionHandler;
 import net.md_5.bungee.api.chat.TextComponent;
 import vg.civcraft.mc.civmodcore.command.CivCommand;
 import vg.civcraft.mc.civmodcore.command.StandaloneCommand;
+import vg.civcraft.mc.namelayer.core.PermissionType;
 
 @CivCommand(id = "janame")
 public class NameCommand extends StandaloneCommand {
@@ -30,7 +32,8 @@ public class NameCommand extends StandaloneCommand {
 		} else {
 			name = args[0];
 		}
-		Snitch snitch = findLookingAtOrClosestSnitch(player, JukeAlertPermissionHandler.getRenameSnitch());
+		PermissionType renamePerm = JukeAlert.getInstance().getPermissionHandler().getRenameSnitch();
+		Snitch snitch = findLookingAtOrClosestSnitch(player, renamePerm);
 		if (snitch == null) {
 			player.sendMessage(
 					ChatColor.RED + "You do not own any snitches nearby or lack permission to view their logs!");

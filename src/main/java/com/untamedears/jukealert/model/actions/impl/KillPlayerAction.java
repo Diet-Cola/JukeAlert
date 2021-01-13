@@ -6,13 +6,13 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import com.github.maxopoly.artemis.NameAPI;
 import com.untamedears.jukealert.model.Snitch;
 import com.untamedears.jukealert.model.actions.abstr.LoggablePlayerVictimAction;
 
 import vg.civcraft.mc.civmodcore.api.ItemAPI;
 import vg.civcraft.mc.civmodcore.inventorygui.DecorationStack;
 import vg.civcraft.mc.civmodcore.inventorygui.IClickable;
-import vg.civcraft.mc.namelayer.NameAPI;
 
 public class KillPlayerAction extends LoggablePlayerVictimAction {
 	
@@ -23,7 +23,7 @@ public class KillPlayerAction extends LoggablePlayerVictimAction {
 	}
 	
 	public String getVictimName() {
-		return NameAPI.getCurrentName(getVictimUUID());
+		return NameAPI.getName(getVictimUUID());
 	}
 	
 	public UUID getVictimUUID() {

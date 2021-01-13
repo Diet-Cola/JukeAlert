@@ -7,6 +7,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import com.untamedears.jukealert.JukeAlert;
 import com.untamedears.jukealert.model.Snitch;
 import com.untamedears.jukealert.model.appender.SnitchLogAppender;
 import com.untamedears.jukealert.util.JAUtility;
@@ -21,7 +22,7 @@ public class ClearCommand extends StandaloneCommand {
 	@Override
 	public boolean execute(final CommandSender sender, String[] args) {
 		Player player = (Player) sender;
-		Snitch snitch = JAUtility.findLookingAtOrClosestSnitch(player, JukeAlertPermissionHandler.getClearLogs());
+		Snitch snitch = JAUtility.findLookingAtOrClosestSnitch(player, JukeAlert.getInstance().getPermissionHandler().getClearLogs());
 		if (snitch == null) {
 			sender.sendMessage(
 					ChatColor.RED + "You do not own any snitches nearby or lack permission to delete their logs!");

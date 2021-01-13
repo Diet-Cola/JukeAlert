@@ -16,37 +16,40 @@ import com.untamedears.jukealert.util.JukeAlertPermissionHandler;
 
 import vg.civcraft.mc.civmodcore.command.CivCommand;
 import vg.civcraft.mc.civmodcore.command.StandaloneCommand;
-import vg.civcraft.mc.namelayer.GroupManager;
-import vg.civcraft.mc.namelayer.NameAPI;
-import vg.civcraft.mc.namelayer.command.TabCompleters.GroupTabCompleter;
-import vg.civcraft.mc.namelayer.group.Group;
+import vg.civcraft.mc.namelayer.core.Group;
+import vg.civcraft.mc.namelayer.mc.GroupAPI;
+import vg.civcraft.mc.namelayer.mc.commands.NameLayerTabCompletion;
 
 @CivCommand(id = "jalist")
 public class ListCommand extends StandaloneCommand {
 
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
-		List<String> groups;
+		if (true) {
+			sender.sendMessage("Command disabled, please ask awoo#7053 to implement it properly");
+			return true;
+		}
+		List<String> groups = null;
 		Player player = (Player) sender;
-		GroupManager gm = NameAPI.getGroupManager();
 		if (args.length == 0) {
-			groups = gm.getAllGroupNames(player.getUniqueId());
+			//groups = GroupAPI.getAllGroupNames(player.getUniqueId());
 		} else {
 			groups = Arrays.asList(args);
 		}
 		List<Integer> groupIds = new ArrayList<>();
 		for (String groupName : groups) {
-			Group group = GroupManager.getGroup(groupName);
+			Group group = GroupAPI.getGroup(groupName);
 			if (group == null) {
 				sender.sendMessage(ChatColor.RED + "The group " + groupName + " does not exist");
 				continue;
 			}
-			if (!gm.hasAccess(group, player.getUniqueId(), JukeAlertPermissionHandler.getListSnitches())) {
+			if (!GroupAPI.hasPermission(player, group, JukeAlert.getInstance().getPermissionHandler().getListSnitches())) {
 				sender.sendMessage(
 						ChatColor.RED + "You do not have permission to list snitches for the group " + group.getName());
 				continue;
 			}
-			groupIds.addAll(group.getGroupIds());
+			groupIds.add(group.getPrimaryId());
+			groupIds.addAll(group.getSecondaryIds());
 		}
 		sender.sendMessage(ChatColor.GREEN + "Retrieving snitches for a total of " + groupIds.size()
 		+ " group instances. This may take a moment");
@@ -77,7 +80,7 @@ public class ListCommand extends StandaloneCommand {
 		} else {
 			last = args[args.length - 1];
 		}
-		return GroupTabCompleter.complete(last, JukeAlertPermissionHandler.getListSnitches(), (Player) sender);
+		return NameLayerTabCompletion.completeGroupName(last, (Player) sender);
 	}
 
 }
