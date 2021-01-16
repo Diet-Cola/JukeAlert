@@ -11,6 +11,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
@@ -316,6 +318,7 @@ public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 		SnitchTypeManager configMan = JukeAlert.getInstance().getSnitchConfigManager();
 		SnitchManager snitchMan = JukeAlert.getInstance().getSnitchManager();
 		WorldIDManager idMan = CivModCorePlugin.getInstance().getWorldIdManager();
+		Set<Integer> groupIDs = new TreeSet<>();
 		try (Connection insertConn = db.getConnection();
 				PreparedStatement selectSnitch = insertConn
 						.prepareStatement("select x, y, z, type_id, group_id, name, id, world_id from ja_snitches");
@@ -337,6 +340,7 @@ public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 				if (groupID == -1) {
 					continue;
 				}
+				groupIDs.add(groupID);
 				String name = rs.getString(6);
 				int id = rs.getInt(7);
 				Snitch snitch = type.create(id, location, name, groupID, false);
@@ -347,6 +351,7 @@ public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 		} catch (SQLException e) {
 			logger.log(Level.SEVERE, "Failed to load snitch from db: ", e);
 		}
+		groupIDs.forEach(GroupAPI::requestToBeCached);
 	}
 
 	public int getOrCreateActionID(String name) {
