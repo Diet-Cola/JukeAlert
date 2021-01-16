@@ -65,7 +65,7 @@ public abstract class LoggablePlayerAction extends PlayerAction implements Logga
 		Location referenceLoc = getLocationForStringRepresentation();
 		boolean sameWorld = JAUtility.isSameWorld(referenceLoc, reference);
 		TextComponent comp = new TextComponent(
-				String.format("%s%s  %s%s  ", ChatColor.GOLD, getChatRepresentationIdentifier(), ChatColor.GREEN, NameAPI.getName(getPlayer())));
+				String.format("%s%s  %s%s  ", ChatColor.GOLD, getChatRepresentationIdentifier(), ChatColor.GREEN, NameAPI.getNameLocal(getPlayer())));
 		if (live) {
 			comp.addExtra(JAUtility.genTextComponent(snitch));
 			comp.addExtra(String.format("  %s%s", ChatColor.YELLOW,

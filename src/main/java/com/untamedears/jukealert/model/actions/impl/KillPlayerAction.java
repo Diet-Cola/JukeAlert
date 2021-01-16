@@ -23,7 +23,7 @@ public class KillPlayerAction extends LoggablePlayerVictimAction {
 	}
 	
 	public String getVictimName() {
-		return NameAPI.getName(getVictimUUID());
+		return NameAPI.getNameLocal(getVictimUUID());
 	}
 	
 	public UUID getVictimUUID() {
