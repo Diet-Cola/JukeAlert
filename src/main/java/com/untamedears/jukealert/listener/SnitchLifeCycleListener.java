@@ -1,10 +1,15 @@
 package com.untamedears.jukealert.listener;
 
+import com.untamedears.jukealert.SnitchManager;
+import com.untamedears.jukealert.model.Snitch;
+import com.untamedears.jukealert.model.SnitchFactoryType;
+import com.untamedears.jukealert.model.SnitchTypeManager;
+import com.untamedears.jukealert.model.actions.internal.DestroySnitchAction.Cause;
+import com.untamedears.jukealert.model.appender.AbstractSnitchAppender;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -15,17 +20,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
-
-import com.untamedears.jukealert.SnitchManager;
-import com.untamedears.jukealert.model.Snitch;
-import com.untamedears.jukealert.model.SnitchFactoryType;
-import com.untamedears.jukealert.model.SnitchTypeManager;
-import com.untamedears.jukealert.model.actions.internal.DestroySnitchAction.Cause;
-import com.untamedears.jukealert.model.appender.AbstractSnitchAppender;
-
 import vg.civcraft.mc.citadel.events.ReinforcementBypassEvent;
 import vg.civcraft.mc.citadel.events.ReinforcementCreationEvent;
 import vg.civcraft.mc.citadel.events.ReinforcementDestructionEvent;
+import vg.civcraft.mc.citadel.events.ReinforcementGroupChangeEvent;
 import vg.civcraft.mc.citadel.model.Reinforcement;
 
 public class SnitchLifeCycleListener implements Listener {
@@ -123,6 +121,21 @@ public class SnitchLifeCycleListener implements Listener {
 			logger.info(String.format("%s destroyed snitch of type %s at %s", name, snitch.getType().getName(),
 					snitch.getLocation().toString()));
 		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	public void changeReinforcement(ReinforcementGroupChangeEvent e) {
+		Location location = e.getReinforcement().getLocation();
+		Snitch snitch = snitchManager.getSnitchAt(location);
+		Player p = e.getPlayer();
+		logger.info(String.format("Group change for snitch of type %s at %s by %s", snitch.getType().getName(),
+				snitch.getLocation().toString(), p != null ? p.getName() : "null"));
+		if (p != null) {
+			p.sendMessage(String.format("%sChanged from group %s%s to group %s%s at [%d %d %d]", ChatColor.GREEN,
+					e.getReinforcement().getGroup().getColoredName(), ChatColor.GREEN, e.getNewGroup().getColoredName(), ChatColor.GREEN, location.getBlockX(),
+					location.getBlockY(), location.getBlockZ()));
+		}
+		snitch.setGroup(e.getNewGroup());
 	}
 
 }
