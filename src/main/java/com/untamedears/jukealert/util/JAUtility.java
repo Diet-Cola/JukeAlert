@@ -1,24 +1,21 @@
 package com.untamedears.jukealert.util;
 
+import com.untamedears.jukealert.JukeAlert;
+import com.untamedears.jukealert.SnitchManager;
+import com.untamedears.jukealert.model.Snitch;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.UUID;
-
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BlockIterator;
-
-import com.untamedears.jukealert.JukeAlert;
-import com.untamedears.jukealert.SnitchManager;
-import com.untamedears.jukealert.model.Snitch;
-
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.hover.content.Text;
 import vg.civcraft.mc.namelayer.core.PermissionType;
 
 // Static methods only
@@ -118,6 +115,13 @@ public final class JAUtility {
 		}
 		sb.append(String.format("%sGroup: %s%s", ChatColor.GOLD, ChatColor.AQUA, snitch.getGroup().getName()));
 		text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(sb.toString())));
+	}
+
+	public static TextComponent addNameMCUUIDLink(TextComponent text, UUID uuid) {
+		text.setColor(net.md_5.bungee.api.ChatColor.GREEN);
+		text.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.namemc.com/profile/"+uuid));
+		text.addExtra(" ");
+		return text;
 	}
 
 	public static Material parseMaterial(String id) {
