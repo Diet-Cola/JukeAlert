@@ -44,7 +44,7 @@ public class SnitchLogAppender extends ConfigurableSnitchAppender<LimitedActionT
 			return;
 		}
 		LoggablePlayerAction log = (LoggablePlayerAction) action;
-		if (snitch.hasPermission(log.getPlayer(), JukeAlertPermissionHandler.getSnitchImmune())) {
+		if (snitch.hasPermission(log.getPlayer(), JukeAlert.getInstance().getPermissionHandler().getSnitchImmune())) {
 			return;
 		}
 		actions.add(log);

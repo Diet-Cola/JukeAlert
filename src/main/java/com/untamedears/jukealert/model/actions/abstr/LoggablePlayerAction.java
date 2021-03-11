@@ -13,7 +13,6 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import vg.civcraft.mc.civmodcore.inventory.items.ItemUtils;
-import vg.civcraft.mc.namelayer.NameAPI;
 
 public abstract class LoggablePlayerAction extends PlayerAction implements LoggableAction {
 	
@@ -61,8 +60,10 @@ public abstract class LoggablePlayerAction extends PlayerAction implements Logga
 	public TextComponent getChatRepresentation(Location reference, boolean live) {
 		Location referenceLoc = getLocationForStringRepresentation();
 		boolean sameWorld = JAUtility.isSameWorld(referenceLoc, reference);
+		TextComponent uuid = new TextComponent(getPlayerName());
 		TextComponent comp = new TextComponent(
-				String.format("%s%s  %s%s  ", ChatColor.GOLD, getChatRepresentationIdentifier(), ChatColor.GREEN, NameAPI.getCurrentName(getPlayer())));
+				String.format("%s%s  %s ", ChatColor.GOLD, getChatRepresentationIdentifier(), ChatColor.GREEN));
+		comp.addExtra(JAUtility.addNameMCUUIDLink(uuid, getPlayer()));
 		if (live) {
 			comp.addExtra(JAUtility.genTextComponent(snitch));
 			comp.addExtra(String.format("  %s%s", ChatColor.YELLOW,

@@ -7,8 +7,14 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import vg.civcraft.mc.namelayer.NameAPI;
-import vg.civcraft.mc.namelayer.group.Group;
+
+import com.github.maxopoly.artemis.NameAPI;
+import com.untamedears.jukealert.model.Snitch;
+import com.untamedears.jukealert.model.actions.abstr.SnitchAction;
+import com.untamedears.jukealert.model.actions.internal.DestroySnitchAction;
+
+import vg.civcraft.mc.namelayer.core.Group;
+import vg.civcraft.mc.namelayer.core.GroupRank;
 
 public class ShowOwnerOnDestroyAppender extends AbstractSnitchAppender {
 
@@ -38,15 +44,16 @@ public class ShowOwnerOnDestroyAppender extends AbstractSnitchAppender {
 			return;
 		}
 		Group group = snitch.getGroup();
-		String groupName;
-		String ownerName;
 		if (group == null) {
-			groupName = "unknown";
-			ownerName = "unknown";
+			sendMessage(player, "unknown", "unknown");
 		} else {
-			groupName = group.getName();
-			ownerName = NameAPI.getCurrentName(group.getOwner());
+			GroupRank ownerRank = group.getGroupRankHandler().getOwnerRank();
+			UUID owner = group.getAllTrackedByType(ownerRank).iterator().next(); //guaranteed not empty
+			NameAPI.consumeNameSync(owner, name -> sendMessage(player, group.getName(), name));
 		}
+	}
+	
+	private void sendMessage(Player player, String groupName, String ownerName) {
 		player.sendMessage(String.format("%s%s %swas reinforced on %s%s%s owned by %s%s", ChatColor.GOLD,
 				snitch.getType().getName(), ChatColor.YELLOW, ChatColor.GREEN, groupName, ChatColor.YELLOW,
 				ChatColor.LIGHT_PURPLE, ownerName));

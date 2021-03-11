@@ -6,10 +6,10 @@ import com.untamedears.jukealert.gui.SnitchOverviewGUI;
 import com.untamedears.jukealert.model.Snitch;
 import com.untamedears.jukealert.model.SnitchTypeManager;
 import com.untamedears.jukealert.model.appender.DormantCullingAppender;
-import com.untamedears.jukealert.util.JukeAlertPermissionHandler;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -18,10 +18,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import vg.civcraft.mc.civmodcore.command.CivCommand;
 import vg.civcraft.mc.civmodcore.command.StandaloneCommand;
-import vg.civcraft.mc.namelayer.GroupManager;
-import vg.civcraft.mc.namelayer.NameAPI;
-import vg.civcraft.mc.namelayer.command.TabCompleters.GroupTabCompleter;
-import vg.civcraft.mc.namelayer.group.Group;
+import vg.civcraft.mc.namelayer.core.Group;
+import vg.civcraft.mc.namelayer.mc.GroupAPI;
+import vg.civcraft.mc.namelayer.mc.NameLayerPlugin;
+import vg.civcraft.mc.namelayer.mc.commands.NameLayerTabCompletion;
 
 @CivCommand(id = "jalist")
 public class ListCommand extends StandaloneCommand {
@@ -30,33 +30,40 @@ public class ListCommand extends StandaloneCommand {
 	public boolean execute(final CommandSender sender, final String[] arguments) {
 		final Player player = (Player) sender;
 		boolean playerProvidedGroups = true;
-		List<String> groupNames = null;
+		List<String> groupNames = new ArrayList<>();
 		if (ArrayUtils.isNotEmpty(arguments)) {
 			groupNames = Arrays.asList(arguments);
 			groupNames.removeIf(Strings::isNullOrEmpty);
 		}
 		if (CollectionUtils.isEmpty(groupNames)) {
-			groupNames = NameAPI.getGroupManager().getAllGroupNames(player.getUniqueId());
+			Set<Group> groups = NameLayerPlugin.getInstance().getGroupTracker().getGroupsForPlayer(player.getUniqueId());
+			if (groups.isEmpty()) {
+				player.sendMessage(ChatColor.RED + "You are not a member of any groups");
+				return true;
+			}
+			for (Group group : groups) {
+				groupNames.add(group.getName());
+			}
 			playerProvidedGroups = false;
 		}
 		final var groupIds = new ArrayList<Integer>();
 		for (final String groupName : groupNames) {
-			final Group group = GroupManager.getGroup(groupName);
+			final Group group = GroupAPI.getGroup(groupName);
 			if (group == null) {
 				if (playerProvidedGroups) {
 					sender.sendMessage(ChatColor.RED + "The group " + groupName + " does not exist");
 				}
 				continue;
 			}
-			if (!NameAPI.getGroupManager().hasAccess(group, player.getUniqueId(),
-					JukeAlertPermissionHandler.getListSnitches())) {
+			if (!GroupAPI.hasPermission(player.getUniqueId(), group,
+					JukeAlert.getInstance().getPermissionHandler().getListSnitches())) {
 				if (playerProvidedGroups) {
 					sender.sendMessage(ChatColor.RED + "You do not have permission to list snitches "
 							+ "for the group " + group.getName());
 				}
 				continue;
 			}
-			groupIds.addAll(group.getGroupIds());
+			groupIds.add(group.getPrimaryId());
 		}
 		if (groupIds.isEmpty()) {
 			sender.sendMessage(ChatColor.GREEN + "You do not have access to any group's snitches.");
@@ -91,9 +98,14 @@ public class ListCommand extends StandaloneCommand {
 	}
 
 	@Override
-	public List<String> tabComplete(final CommandSender sender, final String[] arguments) {
-		final String last = ArrayUtils.isEmpty(arguments) ? "" : arguments[arguments.length - 1];
-		return GroupTabCompleter.complete(last, JukeAlertPermissionHandler.getListSnitches(), (Player) sender);
+	public List<String> tabComplete(CommandSender sender, String[] args) {
+		String last;
+		if (args.length == 0) {
+			last = "";
+		} else {
+			last = args[args.length - 1];
+		}
+		return NameLayerTabCompletion.completeGroupName(last, (Player) sender);
 	}
 
 }

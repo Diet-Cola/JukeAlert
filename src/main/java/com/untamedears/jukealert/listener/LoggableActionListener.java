@@ -1,5 +1,6 @@
 package com.untamedears.jukealert.listener;
 
+import com.untamedears.jukealert.JukeAlert;
 import com.untamedears.jukealert.SnitchManager;
 import com.untamedears.jukealert.model.Snitch;
 import com.untamedears.jukealert.model.actions.abstr.SnitchAction;
@@ -20,7 +21,6 @@ import com.untamedears.jukealert.model.actions.impl.LoginAction;
 import com.untamedears.jukealert.model.actions.impl.LogoutAction;
 import com.untamedears.jukealert.model.actions.impl.MountEntityAction;
 import com.untamedears.jukealert.model.actions.impl.OpenContainerAction;
-import com.untamedears.jukealert.util.JukeAlertPermissionHandler;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -59,7 +59,6 @@ import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.inventory.InventoryHolder;
 import org.spigotmc.event.entity.EntityDismountEvent;
 import org.spigotmc.event.entity.EntityMountEvent;
-import vg.civcraft.mc.namelayer.NameAPI;
 
 public class LoggableActionListener implements Listener {
 	
@@ -254,7 +253,7 @@ public class LoggableActionListener implements Listener {
 		}
 		Collection<Snitch> snitches = snitchManager.getSnitchesCovering(player.getLocation());
 		for (Snitch snitch : snitches) {
-			if (!snitch.hasPermission(player, JukeAlertPermissionHandler.getSnitchImmune())) {
+			if (!snitch.hasPermission(player, JukeAlert.getInstance().getPermissionHandler().getSnitchImmune())) {
 				snitch.processAction(actionCreator.apply(snitch));
 			}
 		}
@@ -264,10 +263,10 @@ public class LoggableActionListener implements Listener {
 		if (isPlayerSnitchImmune(player)) {
 			return;
 		}
-		if (!player.getMetadata("NPC").isEmpty() || NameAPI.getCurrentName(player.getUniqueId()) == null) {
+		/*if (!player.getMetadata("NPC").isEmpty() || ArtemisPlugin.getInstance().getPlayerDataManager().getOnlinePlayerData(player.getUniqueId()) == null) {
 			//CombatTagPlus
 			return;
-		}
+		}*/
 		Collection<Snitch> insideNow = snitchManager.getSnitchesCovering(location);
 		Set<Snitch> previouslyIn = insideFields.computeIfAbsent(player.getUniqueId(), s -> new HashSet<>());
 		insideNow.stream().filter(s -> !previouslyIn.contains(s)).forEach(s -> {

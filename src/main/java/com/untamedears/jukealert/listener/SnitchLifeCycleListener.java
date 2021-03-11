@@ -131,10 +131,11 @@ public class SnitchLifeCycleListener implements Listener {
 		logger.info(String.format("Group change for snitch of type %s at %s by %s", snitch.getType().getName(),
 				snitch.getLocation().toString(), p != null ? p.getName() : "null"));
 		if (p != null) {
-			p.sendMessage(String.format("%sChanged from group %s to group %s at [%d %d %d]", ChatColor.GREEN,
-					e.getReinforcement().getGroup().getName(), e.getNewGroup().getName(), location.getBlockX(),
+			p.sendMessage(String.format("%sChanged from group %s%s to group %s%s at [%d %d %d]", ChatColor.GREEN,
+					e.getReinforcement().getGroup().getColoredName(), ChatColor.GREEN, e.getNewGroup().getColoredName(), ChatColor.GREEN, location.getBlockX(),
 					location.getBlockY(), location.getBlockZ()));
 		}
 		snitch.setGroup(e.getNewGroup());
 	}
+
 }

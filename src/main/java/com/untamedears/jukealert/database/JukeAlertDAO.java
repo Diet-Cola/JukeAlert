@@ -22,6 +22,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
@@ -33,14 +35,27 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
+
+import com.github.maxopoly.artemis.NameAPI;
+import com.untamedears.jukealert.JukeAlert;
+import com.untamedears.jukealert.SnitchManager;
+import com.untamedears.jukealert.model.Snitch;
+import com.untamedears.jukealert.model.SnitchFactoryType;
+import com.untamedears.jukealert.model.SnitchTypeManager;
+import com.untamedears.jukealert.model.actions.ActionCacheState;
+import com.untamedears.jukealert.model.actions.LoggedActionFactory;
+import com.untamedears.jukealert.model.actions.LoggedActionPersistence;
+import com.untamedears.jukealert.model.actions.abstr.LoggableAction;
+import com.untamedears.jukealert.model.actions.abstr.LoggablePlayerAction;
+import com.untamedears.jukealert.model.appender.AbstractSnitchAppender;
+
 import vg.civcraft.mc.civmodcore.CivModCorePlugin;
 import vg.civcraft.mc.civmodcore.dao.ManagedDatasource;
 import vg.civcraft.mc.civmodcore.locations.chunkmeta.CacheState;
 import vg.civcraft.mc.civmodcore.locations.global.GlobalTrackableDAO;
 import vg.civcraft.mc.civmodcore.locations.global.WorldIDManager;
-import vg.civcraft.mc.namelayer.GroupManager;
-import vg.civcraft.mc.namelayer.NameAPI;
-import vg.civcraft.mc.namelayer.group.Group;
+import vg.civcraft.mc.namelayer.core.Group;
+import vg.civcraft.mc.namelayer.mc.GroupAPI;
 
 public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 
@@ -109,11 +124,11 @@ public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 							return false;
 						}
 						int snitchType = logging ? 1 : 0;
-						Group group = GroupManager.getGroup(groupName);
+						Group group = GroupAPI.getGroup(groupName);
 						if (group == null) {
 							continue;
 						}
-						int groupId = group.getGroupId();
+						int groupId = group.getPrimaryId();
 
 						insertSnitch.setInt(1, groupId);
 						insertSnitch.setInt(2, snitchType);
@@ -251,7 +266,7 @@ public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 			if (snitch.getGroup() == null) {
 				return;
 			}
-			int groupId = snitch.getGroup().getGroupId();
+			int groupId = snitch.getGroup().getPrimaryId();
 			insertSnitch.setInt(1, groupId);
 			insertSnitch.setInt(2, snitch.getType().getID());
 			insertSnitch.setInt(3, snitch.getLocation().getBlockX());
@@ -278,7 +293,7 @@ public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 		try (Connection insertConn = db.getConnection();
 				PreparedStatement updateSnitch = insertConn
 						.prepareStatement("update ja_snitches set name = ?, group_id = ? where id = ?;")) {
-			int groupId = snitch.getGroup() == null ? -1 : snitch.getGroup().getGroupId();
+			int groupId = snitch.getGroup() == null ? -1 : snitch.getGroup().getPrimaryId();
 			if (groupId == -1) {
 				delete(snitch);
 				snitch.setCacheState(CacheState.DELETED);
@@ -313,6 +328,7 @@ public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 		SnitchTypeManager configMan = JukeAlert.getInstance().getSnitchConfigManager();
 		SnitchManager snitchMan = JukeAlert.getInstance().getSnitchManager();
 		WorldIDManager idMan = CivModCorePlugin.getInstance().getWorldIdManager();
+		Set<Integer> groupIDs = new TreeSet<>();
 		try (Connection insertConn = db.getConnection();
 				PreparedStatement selectSnitch = insertConn
 						.prepareStatement("select x, y, z, type_id, group_id, name, id, world_id from ja_snitches");
@@ -334,6 +350,7 @@ public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 				if (groupID == -1) {
 					continue;
 				}
+				groupIDs.add(groupID);
 				String name = rs.getString(6);
 				int id = rs.getInt(7);
 				Snitch snitch = type.create(id, location, name, groupID, false);
@@ -344,6 +361,7 @@ public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 		} catch (SQLException e) {
 			logger.log(Level.SEVERE, "Failed to load snitch from db: ", e);
 		}
+		groupIDs.forEach(GroupAPI::requestToBeCached);
 	}
 
 	public int getOrCreateActionID(String name) {

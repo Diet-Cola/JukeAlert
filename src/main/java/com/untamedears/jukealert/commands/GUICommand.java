@@ -24,7 +24,7 @@ public class GUICommand extends StandaloneCommand {
 	public boolean execute(CommandSender sender, String[] args) {
 		Player player = (Player) sender;
 		Snitch cursorSnitch = JAUtility.getSnitchUnderCursor(player);
-		if (cursorSnitch != null && cursorSnitch.hasPermission(player, JukeAlertPermissionHandler.getReadLogs())) {
+		if (cursorSnitch != null && cursorSnitch.hasPermission(player, JukeAlert.getInstance().getPermissionHandler().getReadLogs())) {
 			SnitchLogGUI gui = new SnitchLogGUI(player, cursorSnitch);
 			gui.showScreen();
 			return true;
@@ -36,7 +36,7 @@ public class GUICommand extends StandaloneCommand {
 		Iterator<Snitch> iter = snitches.iterator();
 		while (iter.hasNext()) {
 			Snitch snitch = iter.next();
-			if (!snitch.hasPermission(player, JukeAlertPermissionHandler.getReadLogs())) {
+			if (!snitch.hasPermission(player, JukeAlert.getInstance().getPermissionHandler().getReadLogs())) {
 				iter.remove();
 			}
 		}

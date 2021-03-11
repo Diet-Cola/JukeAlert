@@ -1,69 +1,69 @@
 package com.untamedears.jukealert.util;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import vg.civcraft.mc.namelayer.GroupManager.PlayerType;
-import vg.civcraft.mc.namelayer.permission.PermissionType;
+import vg.civcraft.mc.namelayer.core.DefaultPermissionLevel;
+import vg.civcraft.mc.namelayer.core.PermissionTracker;
+import vg.civcraft.mc.namelayer.core.PermissionType;
+import vg.civcraft.mc.namelayer.mc.GroupAPI;
 
 public final class JukeAlertPermissionHandler {
 
-	private JukeAlertPermissionHandler() {
+	private final static String SNITCH_IMMUNE = "SNITCH_IMMUNE";
+	private final static String LIST_SNITCHES = "LIST_SNITCHES";
+	private final static String CLEAR_LOGS = "CLEAR_SNITCHLOG";
+	private final static String READ_LOGS = "READ_SNITCHLOG";
+	private final static String RENAME_SNITCH = "RENAME_SNITCH";
+	private final static String RECEIVE_ALERTS = "SNITCH_NOTIFICATIONS";
+	private final static String LOOKUP_SNITCH = "DETECT_SNITCH";
+	private final static String TOGGLE_LEVER = "SNITCH_TOGGLE_LEVER";
+	
+	private PermissionTracker permTracker;
+	
+	public JukeAlertPermissionHandler(PermissionTracker permTracker) {
+		this.permTracker = permTracker;
+		setup();
 	}
 
-	private static PermissionType snitchImmune;
-	private static PermissionType listSnitches;
-	private static PermissionType clearLogs;
-	private static PermissionType readLogs;
-	private static PermissionType renameSnitch;
-	private static PermissionType receiveAlerts;
-	private static PermissionType lookupSnitch;
-	private static PermissionType toggleLever;
-
-	public static void setup() {
-		List<PlayerType> memberAndAbove = Arrays.asList(PlayerType.MEMBERS, PlayerType.MODS, PlayerType.ADMINS,
-				PlayerType.OWNER);
-		List<PlayerType> modAndAbove = Arrays.asList(PlayerType.MODS, PlayerType.ADMINS, PlayerType.OWNER);
+	private static void setup() {
 		// Also tied to refreshing snitches
-		listSnitches = PermissionType.registerPermission("LIST_SNITCHES", new ArrayList<>(modAndAbove), "Allows a player to see all snitches in this group.");
-		receiveAlerts = PermissionType.registerPermission("SNITCH_NOTIFICATIONS", new ArrayList<>(memberAndAbove), "Allows a player to see snitch chat messages.");
-		readLogs = PermissionType.registerPermission("READ_SNITCHLOG", new ArrayList<>(memberAndAbove), "Allows a player to see previous actions that have occurred \n in a snitch radius.");
-		renameSnitch = PermissionType.registerPermission("RENAME_SNITCH", new ArrayList<>(modAndAbove), "Allows a player to rename a snitch.");
-		snitchImmune = PermissionType.registerPermission("SNITCH_IMMUNE", new ArrayList<>(memberAndAbove), "Stops a snitch from recording a players actions.");
-		lookupSnitch = PermissionType.registerPermission("DETECT_SNITCH", new ArrayList<>(memberAndAbove));
-		clearLogs = PermissionType.registerPermission("CLEAR_SNITCHLOG", new ArrayList<>(modAndAbove), "Permits a player to clear a snitch log.");
-		toggleLever = PermissionType.registerPermission("SNITCH_TOGGLE_LEVER", new ArrayList<>(modAndAbove), "Determines whether a player can toggle whether a lever is \n pulled when a player enters the snitch radius.");
+		GroupAPI.registerPermission(LIST_SNITCHES, DefaultPermissionLevel.MOD, "Allows a player to see all snitches in this group.");
+		GroupAPI.registerPermission(RECEIVE_ALERTS, DefaultPermissionLevel.MEMBER, "Allows a player to see snitch chat messages.");
+		GroupAPI.registerPermission(READ_LOGS, DefaultPermissionLevel.MEMBER,  "Allows a player to see previous actions that have occurred \n in a snitch radius.");
+		GroupAPI.registerPermission(RENAME_SNITCH, DefaultPermissionLevel.MOD, "Allows a player to rename a snitch.");
+		GroupAPI.registerPermission(SNITCH_IMMUNE, DefaultPermissionLevel.MEMBER, "Stops a snitch from recording a players actions.");
+		GroupAPI.registerPermission(LOOKUP_SNITCH, DefaultPermissionLevel.MEMBER, "Allows a player to use /jalookup to view what group a snitch is on");
+		GroupAPI.registerPermission(CLEAR_LOGS, DefaultPermissionLevel.MOD, "Permits a player to clear a snitch log.");
+		GroupAPI.registerPermission(TOGGLE_LEVER, DefaultPermissionLevel.MOD, "Determines whether a player can toggle whether a lever is \n pulled when a player enters the snitch radius.");
 	}
 
-	public static PermissionType getRenameSnitch() {
-		return renameSnitch;
+	public PermissionType getRenameSnitch() {
+		return permTracker.getPermission(RENAME_SNITCH);
 	}
 
-	public static PermissionType getSnitchImmune() {
-		return snitchImmune;
+	public PermissionType getSnitchImmune() {
+		return permTracker.getPermission(SNITCH_IMMUNE);
 	}
 
-	public static PermissionType getListSnitches() {
-		return listSnitches;
+	public PermissionType getListSnitches() {
+		return permTracker.getPermission(LIST_SNITCHES);
 	}
 
-	public static PermissionType getClearLogs() {
-		return clearLogs;
+	public PermissionType getClearLogs() {
+		return permTracker.getPermission(CLEAR_LOGS);
 	}
 
-	public static PermissionType getReadLogs() {
-		return readLogs;
+	public PermissionType getReadLogs() {
+		return permTracker.getPermission(READ_LOGS);
 	}
 
-	public static PermissionType getSnitchAlerts() {
-		return receiveAlerts;
+	public PermissionType getSnitchAlerts() {
+		return permTracker.getPermission(RECEIVE_ALERTS);
 	}
 	
-	public static PermissionType getToggleLevers() {
-		return toggleLever;
+	public PermissionType getToggleLevers() {
+		return permTracker.getPermission(TOGGLE_LEVER);
 	}
 
-	public static PermissionType getLookupSnitch() {
-		return lookupSnitch;
+	public PermissionType getLookupSnitch() {
+		return permTracker.getPermission(LOOKUP_SNITCH);
 	}
 }

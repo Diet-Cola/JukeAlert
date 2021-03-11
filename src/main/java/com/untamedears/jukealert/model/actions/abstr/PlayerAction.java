@@ -5,7 +5,10 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
-import vg.civcraft.mc.namelayer.NameAPI;
+
+import com.github.maxopoly.artemis.NameAPI;
+import com.untamedears.jukealert.model.Snitch;
+
 
 public abstract class PlayerAction extends SnitchAction {
 
@@ -35,7 +38,10 @@ public abstract class PlayerAction extends SnitchAction {
 	}
 
 	public String getPlayerName() {
-		return NameAPI.getCurrentName(player);
+		if (NameAPI.getNameLocal(getPlayer()) == null) {
+			return getPlayer().toString();
+		}
+		return NameAPI.getNameLocal(getPlayer());
 	}
 
 }

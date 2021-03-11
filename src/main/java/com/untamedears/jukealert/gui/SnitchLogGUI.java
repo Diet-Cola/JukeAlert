@@ -5,7 +5,6 @@ import com.untamedears.jukealert.model.Snitch;
 import com.untamedears.jukealert.model.actions.abstr.LoggableAction;
 import com.untamedears.jukealert.model.appender.LeverToggleAppender;
 import com.untamedears.jukealert.model.appender.SnitchLogAppender;
-import com.untamedears.jukealert.util.JukeAlertPermissionHandler;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -14,6 +13,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import vg.civcraft.mc.civmodcore.api.ItemAPI;
 import vg.civcraft.mc.civmodcore.chat.dialog.Dialog;
 import vg.civcraft.mc.civmodcore.inventory.items.ItemUtils;
 import vg.civcraft.mc.civmodcore.inventorygui.Clickable;
@@ -21,6 +21,7 @@ import vg.civcraft.mc.civmodcore.inventorygui.ClickableInventory;
 import vg.civcraft.mc.civmodcore.inventorygui.DecorationStack;
 import vg.civcraft.mc.civmodcore.inventorygui.IClickable;
 import vg.civcraft.mc.civmodcore.inventorygui.MultiPageView;
+import vg.civcraft.mc.namelayer.core.PermissionType;
 
 public class SnitchLogGUI {
 
@@ -52,12 +53,13 @@ public class SnitchLogGUI {
 
 	private IClickable constructClearClick() {
 		ItemStack is = new ItemStack(Material.TNT);
-		ItemUtils.setDisplayName(is, ChatColor.GOLD + "Clear all logs");
-		if (snitch.hasPermission(player, JukeAlertPermissionHandler.getClearLogs())) {
+		PermissionType clearPerm = JukeAlert.getInstance().getPermissionHandler().getClearLogs();
+		ItemAPI.setDisplayName(is, ChatColor.GOLD + "Clear all logs");
+		if (snitch.hasPermission(player, clearPerm)) {
 			return new Clickable(is) {
 				@Override
 				public void clicked(Player p) {
-					if (snitch.hasPermission(player, JukeAlertPermissionHandler.getClearLogs())) {
+					if (snitch.hasPermission(player, clearPerm)) {
 						logAppender.deleteLogs();
 						ClickableInventory.forceCloseInventory(player);
 					}
@@ -103,13 +105,14 @@ public class SnitchLogGUI {
 	private IClickable constructLeverToggleClick() {
 		LeverToggleAppender leverAppender = (LeverToggleAppender) snitch.getAppender(LeverToggleAppender.class);
 		ItemStack is = new ItemStack(Material.LEVER);
-		ItemUtils.setDisplayName(is, ChatColor.GOLD + "Toggle lever activation by redstone");
-		ItemUtils.addLore(is, ChatColor.AQUA + "Currently turned " + ((leverAppender.shouldToggle()) ? "on" : "off"));
-		if (snitch.hasPermission(player, JukeAlertPermissionHandler.getToggleLevers())) {
+		ItemAPI.setDisplayName(is, ChatColor.GOLD + "Toggle lever activation by redstone");
+		ItemAPI.addLore(is, ChatColor.AQUA + "Currently turned " + ((leverAppender.shouldToggle()) ? "on" : "off"));
+		PermissionType togglePerm = JukeAlert.getInstance().getPermissionHandler().getClearLogs();
+		if (snitch.hasPermission(player, togglePerm)) {
 			return new Clickable(is) {
 				@Override
 				public void clicked(Player p) {
-					if (snitch.hasPermission(player, JukeAlertPermissionHandler.getToggleLevers())) {
+					if (snitch.hasPermission(player, togglePerm)) {
 						leverAppender.switchState();
 						p.sendMessage(ChatColor.GREEN + "Toggled lever activation "
 								+ (leverAppender.shouldToggle() ? "off" : "on"));

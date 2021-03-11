@@ -1,5 +1,6 @@
 package com.untamedears.jukealert.model.actions.impl;
 
+import com.github.maxopoly.artemis.NameAPI;
 import com.untamedears.jukealert.model.Snitch;
 import com.untamedears.jukealert.model.actions.abstr.LoggablePlayerVictimAction;
 import java.util.UUID;
@@ -9,7 +10,6 @@ import org.bukkit.inventory.ItemStack;
 import vg.civcraft.mc.civmodcore.inventory.items.ItemUtils;
 import vg.civcraft.mc.civmodcore.inventorygui.DecorationStack;
 import vg.civcraft.mc.civmodcore.inventorygui.IClickable;
-import vg.civcraft.mc.namelayer.NameAPI;
 
 public class KillPlayerAction extends LoggablePlayerVictimAction {
 	
@@ -20,7 +20,7 @@ public class KillPlayerAction extends LoggablePlayerVictimAction {
 	}
 	
 	public String getVictimName() {
-		return NameAPI.getCurrentName(getVictimUUID());
+		return NameAPI.getNameLocal(getVictimUUID());
 	}
 	
 	public UUID getVictimUUID() {
