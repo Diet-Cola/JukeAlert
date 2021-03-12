@@ -10,6 +10,7 @@ import vg.civcraft.mc.civmodcore.command.CivCommand;
 import vg.civcraft.mc.civmodcore.command.StandaloneCommand;
 import vg.civcraft.mc.namelayer.core.Group;
 import vg.civcraft.mc.namelayer.mc.GroupAPI;
+import vg.civcraft.mc.namelayer.mc.commands.NameLayerTabCompletion;
 
 @CivCommand(id = "jamute")
 public class MuteCommand extends StandaloneCommand {
@@ -38,6 +39,6 @@ public class MuteCommand extends StandaloneCommand {
 
 	@Override
 	public List<String> tabComplete(CommandSender sender, String[] args) {
-		return null;
+		return NameLayerTabCompletion.completeGroupName("", (Player) sender);
 	}
 }
