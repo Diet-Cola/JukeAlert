@@ -2,6 +2,7 @@ package com.untamedears.jukealert.commands;
 
 import com.untamedears.jukealert.JukeAlert;
 import com.untamedears.jukealert.util.JASettingsManager;
+import java.util.Collections;
 import java.util.List;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -19,6 +20,9 @@ public class MuteCommand extends StandaloneCommand {
 		if (!(sender instanceof Player)) {
 			sender.sendMessage(ChatColor.RED + "Players only");
 			return true;
+		}
+		if (args.length == 0) {
+			return false;
 		}
 		Player player = (Player) sender;
 		Group group = GroupAPI.getGroup(args[0]);
@@ -39,6 +43,9 @@ public class MuteCommand extends StandaloneCommand {
 
 	@Override
 	public List<String> tabComplete(CommandSender sender, String[] args) {
+		if (args.length == 0) {
+			return Collections.emptyList();
+		}
 		return NameLayerTabCompletion.completeGroupName("", (Player) sender);
 	}
 }
