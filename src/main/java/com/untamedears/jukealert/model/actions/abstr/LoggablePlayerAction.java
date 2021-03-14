@@ -1,21 +1,17 @@
 package com.untamedears.jukealert.model.actions.abstr;
 
+import com.untamedears.jukealert.model.Snitch;
+import com.untamedears.jukealert.model.actions.ActionCacheState;
+import com.untamedears.jukealert.model.actions.LoggedActionPersistence;
+import com.untamedears.jukealert.util.JAUtility;
 import java.util.UUID;
-
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
-
-import com.github.maxopoly.artemis.NameAPI;
-import com.untamedears.jukealert.model.Snitch;
-import com.untamedears.jukealert.model.actions.ActionCacheState;
-import com.untamedears.jukealert.model.actions.LoggedActionPersistence;
-import com.untamedears.jukealert.util.JAUtility;
-
-import net.md_5.bungee.api.chat.TextComponent;
 import vg.civcraft.mc.civmodcore.api.ItemAPI;
 
 public abstract class LoggablePlayerAction extends PlayerAction implements LoggableAction {
@@ -64,8 +60,10 @@ public abstract class LoggablePlayerAction extends PlayerAction implements Logga
 	public TextComponent getChatRepresentation(Location reference, boolean live) {
 		Location referenceLoc = getLocationForStringRepresentation();
 		boolean sameWorld = JAUtility.isSameWorld(referenceLoc, reference);
+		TextComponent uuid = new TextComponent(getPlayerName());
 		TextComponent comp = new TextComponent(
-				String.format("%s%s  %s%s  ", ChatColor.GOLD, getChatRepresentationIdentifier(), ChatColor.GREEN, NameAPI.getNameLocal(getPlayer())));
+				String.format("%s%s  %s ", ChatColor.GOLD, getChatRepresentationIdentifier(), ChatColor.GREEN));
+		comp.addExtra(JAUtility.addNameMCUUIDLink(uuid, getPlayer()));
 		if (live) {
 			comp.addExtra(JAUtility.genTextComponent(snitch));
 			comp.addExtra(String.format("  %s%s", ChatColor.YELLOW,

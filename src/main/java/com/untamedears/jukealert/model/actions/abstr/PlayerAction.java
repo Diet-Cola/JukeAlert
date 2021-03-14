@@ -37,7 +37,10 @@ public abstract class PlayerAction extends SnitchAction {
 	}
 
 	public String getPlayerName() {
-		return NameAPI.getNameLocal(player);
+		if (NameAPI.getNameLocal(getPlayer()) == null) {
+			return getPlayer().toString();
+		}
+		return NameAPI.getNameLocal(getPlayer());
 	}
 
 }

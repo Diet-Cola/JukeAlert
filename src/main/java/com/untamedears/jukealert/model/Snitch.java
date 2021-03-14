@@ -154,6 +154,17 @@ public class Snitch extends LocationTrackable {
 		return this.name;
 	}
 
+
+	/**
+	 * Changes the snitch's group
+	 *
+	 * @param group New group
+	 */
+	public void setGroup(Group group) {
+		this.groupID = group.getPrimaryId();
+		setCacheState(CacheState.MODIFIED);
+	}
+
 	/**
 	 * Sets the internal database id of the snitch, should only be used after first
 	 * inserting the snitch into the database

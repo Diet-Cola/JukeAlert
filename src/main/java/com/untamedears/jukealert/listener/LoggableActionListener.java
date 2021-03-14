@@ -1,5 +1,26 @@
 package com.untamedears.jukealert.listener;
 
+import com.untamedears.jukealert.JukeAlert;
+import com.untamedears.jukealert.SnitchManager;
+import com.untamedears.jukealert.model.Snitch;
+import com.untamedears.jukealert.model.actions.abstr.SnitchAction;
+import com.untamedears.jukealert.model.actions.impl.BlockBreakAction;
+import com.untamedears.jukealert.model.actions.impl.BlockPlaceAction;
+import com.untamedears.jukealert.model.actions.impl.DestroyVehicleAction;
+import com.untamedears.jukealert.model.actions.impl.DismountEntityAction;
+import com.untamedears.jukealert.model.actions.impl.EmptyBucketAction;
+import com.untamedears.jukealert.model.actions.impl.EnterFieldAction;
+import com.untamedears.jukealert.model.actions.impl.EnterVehicleAction;
+import com.untamedears.jukealert.model.actions.impl.ExitVehicleAction;
+import com.untamedears.jukealert.model.actions.impl.FillBucketAction;
+import com.untamedears.jukealert.model.actions.impl.IgniteBlockAction;
+import com.untamedears.jukealert.model.actions.impl.KillLivingEntityAction;
+import com.untamedears.jukealert.model.actions.impl.KillPlayerAction;
+import com.untamedears.jukealert.model.actions.impl.LeaveFieldAction;
+import com.untamedears.jukealert.model.actions.impl.LoginAction;
+import com.untamedears.jukealert.model.actions.impl.LogoutAction;
+import com.untamedears.jukealert.model.actions.impl.MountEntityAction;
+import com.untamedears.jukealert.model.actions.impl.OpenContainerAction;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -9,7 +30,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.function.Function;
-
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -39,31 +59,6 @@ import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.inventory.InventoryHolder;
 import org.spigotmc.event.entity.EntityDismountEvent;
 import org.spigotmc.event.entity.EntityMountEvent;
-
-import com.github.maxopoly.artemis.ArtemisPlugin;
-import com.github.maxopoly.artemis.NameAPI;
-import com.untamedears.jukealert.JukeAlert;
-import com.untamedears.jukealert.SnitchManager;
-import com.untamedears.jukealert.model.Snitch;
-import com.untamedears.jukealert.model.actions.abstr.SnitchAction;
-import com.untamedears.jukealert.model.actions.impl.BlockBreakAction;
-import com.untamedears.jukealert.model.actions.impl.BlockPlaceAction;
-import com.untamedears.jukealert.model.actions.impl.DestroyVehicleAction;
-import com.untamedears.jukealert.model.actions.impl.DismountEntityAction;
-import com.untamedears.jukealert.model.actions.impl.EmptyBucketAction;
-import com.untamedears.jukealert.model.actions.impl.EnterFieldAction;
-import com.untamedears.jukealert.model.actions.impl.EnterVehicleAction;
-import com.untamedears.jukealert.model.actions.impl.ExitVehicleAction;
-import com.untamedears.jukealert.model.actions.impl.FillBucketAction;
-import com.untamedears.jukealert.model.actions.impl.IgniteBlockAction;
-import com.untamedears.jukealert.model.actions.impl.KillLivingEntityAction;
-import com.untamedears.jukealert.model.actions.impl.KillPlayerAction;
-import com.untamedears.jukealert.model.actions.impl.LeaveFieldAction;
-import com.untamedears.jukealert.model.actions.impl.LoginAction;
-import com.untamedears.jukealert.model.actions.impl.LogoutAction;
-import com.untamedears.jukealert.model.actions.impl.MountEntityAction;
-import com.untamedears.jukealert.model.actions.impl.OpenContainerAction;
-import com.untamedears.jukealert.util.JukeAlertPermissionHandler;
 
 public class LoggableActionListener implements Listener {
 	
@@ -268,10 +263,10 @@ public class LoggableActionListener implements Listener {
 		if (isPlayerSnitchImmune(player)) {
 			return;
 		}
-		if (!player.getMetadata("NPC").isEmpty() || ArtemisPlugin.getInstance().getPlayerDataManager().getOnlinePlayerData(player.getUniqueId()) == null) {
+		/*if (!player.getMetadata("NPC").isEmpty() || ArtemisPlugin.getInstance().getPlayerDataManager().getOnlinePlayerData(player.getUniqueId()) == null) {
 			//CombatTagPlus
 			return;
-		}
+		}*/
 		Collection<Snitch> insideNow = snitchManager.getSnitchesCovering(location);
 		Set<Snitch> previouslyIn = insideFields.computeIfAbsent(player.getUniqueId(), s -> new HashSet<>());
 		insideNow.stream().filter(s -> !previouslyIn.contains(s)).forEach(s -> {
