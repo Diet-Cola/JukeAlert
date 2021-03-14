@@ -67,7 +67,7 @@ public final class JAUtility {
 
 	public static TextComponent genTextComponent(Snitch snitch) {
 		String name = snitch.getName().isEmpty() ? snitch.getType().getName() : snitch.getName();
-		TextComponent textComponent = new TextComponent(ChatColor.AQUA + name);
+		TextComponent textComponent = new TextComponent(ChatColor.AQUA + name + " ");
 		addSnitchHoverText(textComponent, snitch);
 		return textComponent;
 	}
