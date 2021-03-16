@@ -1,5 +1,6 @@
 package com.untamedears.jukealert.model.actions.abstr;
 
+import com.untamedears.jukealert.JukeAlert;
 import com.untamedears.jukealert.model.Snitch;
 import com.untamedears.jukealert.model.actions.ActionCacheState;
 import com.untamedears.jukealert.model.actions.LoggedActionPersistence;
@@ -13,6 +14,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import vg.civcraft.mc.civmodcore.inventory.items.ItemUtils;
+import vg.civcraft.mc.civmodcore.inventory.items.MaterialUtils;
 
 public abstract class LoggablePlayerAction extends PlayerAction implements LoggableAction {
 	
@@ -81,6 +83,10 @@ public abstract class LoggablePlayerAction extends PlayerAction implements Logga
 	}
 	
 	protected void enrichGUIItem(ItemStack item) {
+		if (MaterialUtils.isAir(item.getType())){
+			JukeAlert.getInstance().getLogger().info("Tried to enrich air");
+			item = new ItemStack(Material.STONE);
+		}
 		ItemUtils.addLore(item, String.format("%sPlayer: %s", ChatColor.GOLD, getPlayerName()),
 				String.format("%sTime: %s", ChatColor.LIGHT_PURPLE,getFormattedTime()));
 		ItemUtils.setDisplayName(item, ChatColor.GOLD + getGUIName());
