@@ -1,6 +1,7 @@
 package com.untamedears.jukealert.model.actions.abstr;
 
 import com.github.maxopoly.artemis.ArtemisPlugin;
+import com.untamedears.jukealert.JukeAlert;
 import com.untamedears.jukealert.model.Snitch;
 import com.untamedears.jukealert.model.actions.ActionCacheState;
 import com.untamedears.jukealert.model.actions.LoggedActionPersistence;

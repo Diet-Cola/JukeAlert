@@ -156,8 +156,14 @@ public final class JAUtility {
 				return Material.HORSE_SPAWN_EGG;
 			case "MINECART":
 				return Material.MINECART;
-			case "MINECART WITH CHEST":
+			case "MINECART_CHEST":
 				return Material.CHEST_MINECART;
+			case "MINECART_FURNACE":
+				return Material.FURNACE_MINECART;
+			case "MINECART_TNT":
+				return Material.TNT_MINECART;
+			case "MINECART_HOPPER":
+				return Material.HOPPER_MINECART;
 			case "STRIDER":
 				return Material.STRIDER_SPAWN_EGG;
 			case "BOAT":
@@ -174,6 +180,7 @@ public final class JAUtility {
 			case "DARK_OAK_BOAT":
 				return Material.DARK_OAK_BOAT;
 			default:
+				JukeAlert.getInstance().getLogger().info("Failed to parse vehicle into material: " + vehicle);
 				return Material.STONE;
 		}
 	}
