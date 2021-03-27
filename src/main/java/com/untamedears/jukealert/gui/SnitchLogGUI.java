@@ -115,7 +115,7 @@ public class SnitchLogGUI {
 					if (snitch.hasPermission(player, togglePerm)) {
 						leverAppender.switchState();
 						p.sendMessage(ChatColor.GREEN + "Toggled lever activation "
-								+ (leverAppender.shouldToggle() ? "off" : "on"));
+								+ (leverAppender.shouldToggle() ? "on" : "off"));
 						showScreen();
 					}
 				}
