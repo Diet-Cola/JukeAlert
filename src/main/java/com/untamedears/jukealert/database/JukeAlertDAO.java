@@ -1,5 +1,6 @@
 package com.untamedears.jukealert.database;
 
+import com.github.maxopoly.artemis.NameAPI;
 import com.untamedears.jukealert.JukeAlert;
 import com.untamedears.jukealert.SnitchManager;
 import com.untamedears.jukealert.model.Snitch;
@@ -11,6 +12,7 @@ import com.untamedears.jukealert.model.actions.LoggedActionPersistence;
 import com.untamedears.jukealert.model.actions.abstr.LoggableAction;
 import com.untamedears.jukealert.model.actions.abstr.LoggablePlayerAction;
 import com.untamedears.jukealert.model.appender.AbstractSnitchAppender;
+import com.untamedears.jukealert.model.appender.LeverToggleAppender;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -29,28 +31,12 @@ import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.untamedears.jukealert.model.appender.LeverToggleAppender;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
-
-import com.github.maxopoly.artemis.NameAPI;
-import com.untamedears.jukealert.JukeAlert;
-import com.untamedears.jukealert.SnitchManager;
-import com.untamedears.jukealert.model.Snitch;
-import com.untamedears.jukealert.model.SnitchFactoryType;
-import com.untamedears.jukealert.model.SnitchTypeManager;
-import com.untamedears.jukealert.model.actions.ActionCacheState;
-import com.untamedears.jukealert.model.actions.LoggedActionFactory;
-import com.untamedears.jukealert.model.actions.LoggedActionPersistence;
-import com.untamedears.jukealert.model.actions.abstr.LoggableAction;
-import com.untamedears.jukealert.model.actions.abstr.LoggablePlayerAction;
-import com.untamedears.jukealert.model.appender.AbstractSnitchAppender;
-
 import vg.civcraft.mc.civmodcore.CivModCorePlugin;
 import vg.civcraft.mc.civmodcore.dao.ManagedDatasource;
 import vg.civcraft.mc.civmodcore.locations.chunkmeta.CacheState;
@@ -286,9 +272,6 @@ public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 			}
 		} catch (SQLException e) {
 			logger.log(Level.SEVERE, "Failed to insert new snitch: ", e);
-		}
-		if (snitch.hasAppender(LeverToggleAppender.class)) {
-			setToggleLever(snitch.getId(), false);
 		}
 		snitch.persistAppenders();
 	}
