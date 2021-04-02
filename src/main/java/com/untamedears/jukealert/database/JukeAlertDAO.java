@@ -12,7 +12,6 @@ import com.untamedears.jukealert.model.actions.LoggedActionPersistence;
 import com.untamedears.jukealert.model.actions.abstr.LoggableAction;
 import com.untamedears.jukealert.model.actions.abstr.LoggablePlayerAction;
 import com.untamedears.jukealert.model.appender.AbstractSnitchAppender;
-import com.untamedears.jukealert.model.appender.LeverToggleAppender;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -296,10 +295,6 @@ public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 			updateSnitch.execute();
 		} catch (SQLException e) {
 			logger.log(Level.SEVERE, "Failed to update snitch: ", e);
-		}
-		if (snitch.hasAppender(LeverToggleAppender.class)) {
-			LeverToggleAppender lever = (LeverToggleAppender) snitch.getAppender(LeverToggleAppender.class);
-			setToggleLever(snitch.getId(), lever.shouldToggle());
 		}
 		snitch.persistAppenders();
 	}
