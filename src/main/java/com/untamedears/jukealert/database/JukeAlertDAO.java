@@ -44,8 +44,75 @@ import vg.civcraft.mc.namelayer.group.Group;
 
 public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 
+	private boolean batchMode;
+	private List<List<SnitchTuple>> batches;
+
 	public JukeAlertDAO(Logger logger, ManagedDatasource db) {
 		super(logger, db);
+		this.batchMode = false;
+	}
+
+	public void setBatchMode(boolean batch) {
+		this.batchMode = batch;
+		batches = new ArrayList<>();
+		for (int i = 0; i < 3; i++) {
+			batches.add(new ArrayList<>());
+		}
+	}
+
+	public void cleanupBatches() {
+		long currentTime = System.currentTimeMillis();
+		try (Connection conn = db.getConnection();
+			 PreparedStatement deleteSnitch = conn.prepareStatement(
+					 "delete from ja_snitches where id = ?;");) {
+			conn.setAutoCommit(false);
+			for (SnitchTuple tuple : batches.get(2)) {
+				setDeleteDataStatement(deleteSnitch, tuple.snitch);
+				deleteSnitch.addBatch();
+			}
+			logger.info("Batch 2: " + (System.currentTimeMillis() - currentTime) + " ms");
+			logger.info("Batch 2 Size: " + batches.get(2).size());
+			batches.get(2).clear();
+			deleteSnitch.executeBatch();
+			conn.setAutoCommit(true);
+			logger.info("Batch 2 Finish: " + (System.currentTimeMillis() - currentTime) + " ms");
+		} catch (SQLException e) {
+			logger.log(Level.SEVERE, "Failed to delete snitch from db: ", e);
+		}
+		try (Connection conn = db.getConnection();
+			 PreparedStatement insertSnitch = conn.prepareStatement(
+					 "insert into ja_snitches (group_id, type_id, x, y , z, world_id, name) "
+							 + "values(?,?, ?,?,?, ?, ?);");) {
+			conn.setAutoCommit(false);
+			for (SnitchTuple tuple : batches.get(0)) {
+				setInsertDataStatement(insertSnitch, tuple.snitch);
+				insertSnitch.addBatch();
+			}
+			logger.info("Batch 0: " + (System.currentTimeMillis() - currentTime) + " ms");
+			logger.info("Batch 0 Size: " + batches.get(0).size());
+			batches.get(0).clear();
+			insertSnitch.executeBatch();
+			conn.setAutoCommit(true);
+			logger.info("Batch 0 Finish: " + (System.currentTimeMillis() - currentTime) + " ms");
+		} catch (SQLException e) {
+			logger.log(Level.SEVERE, "Failed to insert snitch into db: ", e);
+		}
+		try (Connection conn = db.getConnection();
+			 PreparedStatement updateSnitch = conn.prepareStatement("update ja_snitches set name = ?, group_id = ? where id = ?;");) {
+			conn.setAutoCommit(false);
+			for (SnitchTuple tuple : batches.get(1)) {
+				setInsertDataStatement(updateSnitch, tuple.snitch);
+				updateSnitch.addBatch();
+			}
+			logger.info("Batch 1: " + (System.currentTimeMillis() - currentTime) + " ms");
+			logger.info("Batch 1 Size: " + batches.get(1).size());
+			batches.get(1).clear();
+			updateSnitch.executeBatch();
+			conn.setAutoCommit(true);
+			logger.info("Batch 1 Finish: " + (System.currentTimeMillis() - currentTime) + " ms");
+		} catch (SQLException e) {
+			logger.log(Level.SEVERE, "Failed to update snitch in db: ", e);
+		}
 	}
 
 	@Override
@@ -244,6 +311,10 @@ public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 
 	@Override
 	public void insert(Snitch snitch) {
+		if (batchMode) {
+			batches.get(0).add(new SnitchTuple(snitch));
+			return;
+		}
 		try (Connection insertConn = db.getConnection();
 				PreparedStatement insertSnitch = insertConn
 						.prepareStatement("insert into ja_snitches (group_id, type_id, x, y , z, world_id, name) "
@@ -251,14 +322,7 @@ public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 			if (snitch.getGroup() == null) {
 				return;
 			}
-			int groupId = snitch.getGroup().getGroupId();
-			insertSnitch.setInt(1, groupId);
-			insertSnitch.setInt(2, snitch.getType().getID());
-			insertSnitch.setInt(3, snitch.getLocation().getBlockX());
-			insertSnitch.setInt(4, snitch.getLocation().getBlockY());
-			insertSnitch.setInt(5, snitch.getLocation().getBlockZ());
-			insertSnitch.setShort(6, getWorldID(snitch.getLocation()));
-			insertSnitch.setString(7, snitch.getName());
+			setInsertDataStatement(insertSnitch, snitch);
 			insertSnitch.execute();
 			try (ResultSet rs = insertSnitch.getGeneratedKeys()) {
 				if (!rs.next()) {
@@ -273,23 +337,27 @@ public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 		snitch.persistAppenders();
 	}
 
+	private void setInsertDataStatement(PreparedStatement insertSnitch, Snitch snitch) throws SQLException {
+		int groupId = snitch.getGroup().getGroupId();
+		insertSnitch.setInt(1, groupId);
+		insertSnitch.setInt(2, snitch.getType().getID());
+		insertSnitch.setInt(3, snitch.getLocation().getBlockX());
+		insertSnitch.setInt(4, snitch.getLocation().getBlockY());
+		insertSnitch.setInt(5, snitch.getLocation().getBlockZ());
+		insertSnitch.setShort(6, getWorldID(snitch.getLocation()));
+		insertSnitch.setString(7, snitch.getName());
+	}
+
 	@Override
 	public void update(Snitch snitch) {
+		if (batchMode) {
+			batches.get(1).add(new SnitchTuple(snitch));
+			return;
+		}
 		try (Connection insertConn = db.getConnection();
 				PreparedStatement updateSnitch = insertConn
 						.prepareStatement("update ja_snitches set name = ?, group_id = ? where id = ?;")) {
-			int groupId = snitch.getGroup() == null ? -1 : snitch.getGroup().getGroupId();
-			if (groupId == -1) {
-				delete(snitch);
-				snitch.setCacheState(CacheState.DELETED);
-				return;
-			}
-			updateSnitch.setString(1, snitch.getName());
-			updateSnitch.setInt(2, groupId);
-			if (snitch.getId() == -1) {
-				throw new IllegalStateException("Snitch id can not be null during update");
-			}
-			updateSnitch.setInt(3, snitch.getId());
+			setUpdateDataStatement(updateSnitch, snitch);
 			updateSnitch.execute();
 		} catch (SQLException e) {
 			logger.log(Level.SEVERE, "Failed to update snitch: ", e);
@@ -297,19 +365,45 @@ public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 		snitch.persistAppenders();
 	}
 
+	private void setUpdateDataStatement(PreparedStatement updateSnitch, Snitch snitch) throws SQLException {
+		int groupId = snitch.getGroup() == null ? -1 : snitch.getGroup().getGroupId();
+		if (groupId == -1) {
+			delete(snitch);
+			snitch.setCacheState(CacheState.DELETED);
+			return;
+		}
+		updateSnitch.setString(1, snitch.getName());
+		updateSnitch.setInt(2, groupId);
+		if (snitch.getId() == -1) {
+			throw new IllegalStateException("Snitch id can not be null during update");
+		}
+		updateSnitch.setInt(3, snitch.getId());
+	}
+
 	@Override
 	public void delete(Snitch snitch) {
+		if (batchMode) {
+			batches.get(2).add(new SnitchTuple(snitch));
+			return;
+		}
+		long currentTime = System.currentTimeMillis();
 		try (Connection insertConn = db.getConnection();
 				PreparedStatement deleteSnitch = insertConn.prepareStatement("delete from ja_snitches where id = ?;")) {
-			deleteSnitch.setInt(1, snitch.getId());
+			setDeleteDataStatement(deleteSnitch, snitch);
 			deleteSnitch.execute();
 		} catch (SQLException e) {
 			logger.log(Level.SEVERE, "Failed to delete snitch: ", e);
 		}
+		JukeAlert.getInstance().getLogger().info("Time taken to delete snitch: " + (System.currentTimeMillis() - currentTime) + " ms");
+	}
+
+	private void setDeleteDataStatement(PreparedStatement deleteSnitch, Snitch snitch) throws SQLException {
+		deleteSnitch.setInt(1, snitch.getId());
 	}
 
 	@Override
 	public void loadAll(Consumer<Snitch> insertFunction) {
+		long currentTime = System.currentTimeMillis();
 		SnitchTypeManager configMan = JukeAlert.getInstance().getSnitchConfigManager();
 		SnitchManager snitchMan = JukeAlert.getInstance().getSnitchManager();
 		WorldIDManager idMan = CivModCorePlugin.getInstance().getWorldIdManager();
@@ -344,6 +438,7 @@ public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 		} catch (SQLException e) {
 			logger.log(Level.SEVERE, "Failed to load snitch from db: ", e);
 		}
+		JukeAlert.getInstance().getLogger().info("Time taken to load all snitches: " + (System.currentTimeMillis() - currentTime) + " ms");
 	}
 
 	public int getOrCreateActionID(String name) {
@@ -567,4 +662,11 @@ public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 		return result;
 	}
 
+	private class SnitchTuple {
+		private Snitch snitch;
+
+		SnitchTuple(Snitch snitch) {
+			this.snitch = snitch;
+		}
+	}
 }
