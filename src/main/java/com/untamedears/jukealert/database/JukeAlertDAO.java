@@ -101,7 +101,7 @@ public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 			 PreparedStatement updateSnitch = conn.prepareStatement("update ja_snitches set name = ?, group_id = ? where id = ?;");) {
 			conn.setAutoCommit(false);
 			for (SnitchTuple tuple : batches.get(1)) {
-				setInsertDataStatement(updateSnitch, tuple.snitch);
+				setUpdateDataStatement(updateSnitch, tuple.snitch);
 				updateSnitch.addBatch();
 			}
 			logger.info("Batch 1: " + (System.currentTimeMillis() - currentTime) + " ms");
