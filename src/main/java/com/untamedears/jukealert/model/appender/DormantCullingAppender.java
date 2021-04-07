@@ -147,17 +147,20 @@ public class DormantCullingAppender extends ConfigurableSnitchAppender<DormantCu
 
 	@Override
 	public void updateState() {
+		long currentTime = System.currentTimeMillis();
 		long elapsed = getTimeSinceLastRefresh();
 		if (elapsed >= config.getTotalLifeTime()) {
 			JukeAlert.getInstance().getLogger().info("Culling snitch " + snitch.toString() + " for exceeding life timer");
 			snitch.destroy(null, Cause.CULL);
 			updateInternalProgressTime(Long.MAX_VALUE);
+			JukeAlert.getInstance().getLogger().info("Time taken to cull snitch: " + (System.currentTimeMillis() - currentTime) + " ms");
 			return;
 		}
 		if (elapsed >= config.getLifetime()) {
 			JukeAlert.getInstance().getLogger().info("Deactivating snitch " + snitch.toString() + " for exceeding dormant timer");
 			updateInternalProgressTime(System.currentTimeMillis() + config.getDormantLifeTime());
 			snitch.setActiveStatus(false);
+			JukeAlert.getInstance().getLogger().info("Time taken to deactivate snitch: " + (System.currentTimeMillis() - currentTime) + " ms");
 		}
 	}
 

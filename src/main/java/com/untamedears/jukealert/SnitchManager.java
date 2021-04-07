@@ -68,9 +68,11 @@ public class SnitchManager {
 	public void removeSnitch(Snitch snitch) {
 		api.remove(snitch);
 		SparseQuadTree<SnitchQTEntry> quadTree = getQuadTreeFor(snitch.getLocation());
+		long currentTime = System.currentTimeMillis();
 		for (SnitchQTEntry qt : snitch.getFieldManager().getQTEntries()) {
 			quadTree.remove(qt);
 		}
+		JukeAlert.getInstance().getLogger().info("Time taken to remove quadtree: " + (System.currentTimeMillis() - currentTime) + " ms");
 	}
 
 	public Set<Snitch> getSnitchesCovering(Location location) {
