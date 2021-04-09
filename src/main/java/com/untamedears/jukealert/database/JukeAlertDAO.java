@@ -20,8 +20,10 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
@@ -46,10 +48,12 @@ public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 
 	private boolean batchMode;
 	private List<List<SnitchTuple>> batches;
+	private Set<Snitch> batchPersists;
 
 	public JukeAlertDAO(Logger logger, ManagedDatasource db) {
 		super(logger, db);
 		this.batchMode = false;
+		this.batchPersists = new HashSet<>();
 	}
 
 	public void setBatchMode(boolean batch) {
@@ -64,7 +68,7 @@ public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 		long currentTime = System.currentTimeMillis();
 		try (Connection conn = db.getConnection();
 			 PreparedStatement deleteSnitch = conn.prepareStatement(
-					 "delete from ja_snitches where id = ?;");) {
+					 "delete from ja_snitches where id = ?;")) {
 			conn.setAutoCommit(false);
 			for (SnitchTuple tuple : batches.get(2)) {
 				setDeleteDataStatement(deleteSnitch, tuple.snitch);
@@ -82,10 +86,11 @@ public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 		try (Connection conn = db.getConnection();
 			 PreparedStatement insertSnitch = conn.prepareStatement(
 					 "insert into ja_snitches (group_id, type_id, x, y , z, world_id, name) "
-							 + "values(?,?, ?,?,?, ?, ?);");) {
+							 + "values(?,?, ?,?,?, ?, ?);", Statement.RETURN_GENERATED_KEYS)) {
 			conn.setAutoCommit(false);
 			for (SnitchTuple tuple : batches.get(0)) {
 				setInsertDataStatement(insertSnitch, tuple.snitch);
+				batchPersists.add(tuple.snitch);
 				insertSnitch.addBatch();
 			}
 			logger.info("Batch 0: " + (System.currentTimeMillis() - currentTime) + " ms");
@@ -93,15 +98,17 @@ public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 			batches.get(0).clear();
 			insertSnitch.executeBatch();
 			conn.setAutoCommit(true);
+			batches.get(0).clear();
 			logger.info("Batch 0 Finish: " + (System.currentTimeMillis() - currentTime) + " ms");
 		} catch (SQLException e) {
 			logger.log(Level.SEVERE, "Failed to insert snitch into db: ", e);
 		}
 		try (Connection conn = db.getConnection();
-			 PreparedStatement updateSnitch = conn.prepareStatement("update ja_snitches set name = ?, group_id = ? where id = ?;");) {
+			 PreparedStatement updateSnitch = conn.prepareStatement("update ja_snitches set name = ?, group_id = ? where id = ?;")) {
 			conn.setAutoCommit(false);
 			for (SnitchTuple tuple : batches.get(1)) {
 				setUpdateDataStatement(updateSnitch, tuple.snitch);
+				batchPersists.add(tuple.snitch);
 				updateSnitch.addBatch();
 			}
 			logger.info("Batch 1: " + (System.currentTimeMillis() - currentTime) + " ms");
@@ -112,6 +119,11 @@ public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 			logger.info("Batch 1 Finish: " + (System.currentTimeMillis() - currentTime) + " ms");
 		} catch (SQLException e) {
 			logger.log(Level.SEVERE, "Failed to update snitch in db: ", e);
+		}
+		JukeAlert.getInstance().getLogger().info("Starting to run persist");
+		for (Snitch snitch : batchPersists) {
+			snitch.persistAppenders();
+			JukeAlert.getInstance().getLogger().info("Persisted snitch!");
 		}
 	}
 

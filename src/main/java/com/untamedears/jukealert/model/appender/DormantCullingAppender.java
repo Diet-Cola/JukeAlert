@@ -32,6 +32,7 @@ public class DormantCullingAppender extends ConfigurableSnitchAppender<DormantCu
 	
 	@Override
 	public void postSetup() {
+		JukeAlert.getInstance().info("Called post setup for snitch");
 		if (lastRefresh == -1) {
 			// no data in db due to recent config change, let's use the current time and
 			// mark it for saving later
@@ -103,6 +104,7 @@ public class DormantCullingAppender extends ConfigurableSnitchAppender<DormantCu
 		snitch.setDirty();
 		updateState();
 		JukeAlert.getInstance().getSnitchCullManager().updateCulling(this, calcFutureUpdate());
+		JukeAlert.getInstance().info("Refreshed timer for snitch");
 	}
 
 	public long getTimeSinceLastRefresh() {
