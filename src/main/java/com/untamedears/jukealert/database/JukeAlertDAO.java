@@ -350,6 +350,7 @@ public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 		} catch (SQLException e) {
 			logger.log(Level.SEVERE, "Failed to load snitch from db: ", e);
 		}
+		JukeAlert.getInstance().info("Time taken to load all snitches: " + (System.currentTimeMillis() - currentTime) + " ms");
 	}
 
 	public int getOrCreateActionID(String name) {
