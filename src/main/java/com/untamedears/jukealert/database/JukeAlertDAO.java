@@ -310,6 +310,7 @@ public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 
 	@Override
 	public void loadAll(Consumer<Snitch> insertFunction) {
+		long currentTime = System.currentTimeMillis();
 		SnitchTypeManager configMan = JukeAlert.getInstance().getSnitchConfigManager();
 		SnitchManager snitchMan = JukeAlert.getInstance().getSnitchManager();
 		WorldIDManager idMan = CivModCorePlugin.getInstance().getWorldIdManager();
@@ -336,10 +337,15 @@ public class JukeAlertDAO extends GlobalTrackableDAO<Snitch> {
 				}
 				String name = rs.getString(6);
 				int id = rs.getInt(7);
+				JukeAlert.getInstance().info("Time taken after fetching data: " + (System.currentTimeMillis() - currentTime) + " ms");
 				Snitch snitch = type.create(id, location, name, groupID, false);
+				JukeAlert.getInstance().info("Time taken after creating snitch object: " + (System.currentTimeMillis() - currentTime) + " ms");
 				insertFunction.accept(snitch);
+				JukeAlert.getInstance().info("Time taken after function: " + (System.currentTimeMillis() - currentTime) + " ms");
 				snitchMan.addSnitchToQuadTree(snitch);
+				JukeAlert.getInstance().info("Time taken after adding to quadtree: " + (System.currentTimeMillis() - currentTime) + " ms");
 				snitch.applyToAppenders(AbstractSnitchAppender::postSetup);
+				JukeAlert.getInstance().info("Time taken after applying appenders: " + (System.currentTimeMillis() - currentTime) + " ms");
 			}
 		} catch (SQLException e) {
 			logger.log(Level.SEVERE, "Failed to load snitch from db: ", e);
