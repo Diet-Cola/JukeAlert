@@ -48,12 +48,14 @@ public class SnitchManager {
 	}
 
 	private SparseQuadTree<SnitchQTEntry> getQuadTreeFor(Location loc) {
+		long currentTime = System.currentTimeMillis();
 		SparseQuadTree<SnitchQTEntry> tree = quadTreesByWorld.get(loc.getWorld().getUID());
 		if (tree == null) {
 			JukeAlert.getInstance().getLogger().info("Quad tree for world  " + loc.getWorld().getUID() + " does not exist, creating");
 			tree = new SparseQuadTree<>(1);
 			quadTreesByWorld.put(loc.getWorld().getUID(), tree);
 		}
+		JukeAlert.getInstance().info("Time taken on getQuadTreeFor: " + (System.currentTimeMillis() - currentTime) + " ms");
 		return tree;
 	}
 
