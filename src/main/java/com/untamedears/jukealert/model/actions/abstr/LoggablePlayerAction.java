@@ -7,12 +7,10 @@ import com.untamedears.jukealert.model.actions.LoggedActionPersistence;
 import com.untamedears.jukealert.util.JAUtility;
 import java.util.UUID;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.SkullMeta;
 import vg.civcraft.mc.civmodcore.inventory.items.ItemUtils;
 import vg.civcraft.mc.namelayer.NameAPI;
 
@@ -101,11 +99,7 @@ public abstract class LoggablePlayerAction extends PlayerAction implements Logga
 	protected abstract String getChatRepresentationIdentifier();
 	
 	protected ItemStack getSkullFor(UUID uuid) {
-		ItemStack is = new ItemStack(Material.PLAYER_HEAD);
-		SkullMeta skullMeta = (SkullMeta) is.getItemMeta();
-		skullMeta.setOwningPlayer(Bukkit.getOfflinePlayer(uuid));
-		is.setItemMeta(skullMeta);
-		return is;
+		return new ItemStack(Material.PLAYER_HEAD);
 	}
 
 }
